@@ -1,0 +1,24 @@
+{
+  "name": "perfect-time-to-ukr",
+  "version": "1.0.0",
+  "description": "Twitter bot that tweets whenever a time pattern AB:BA is met",
+  "main": "index.js",
+  "dependencies": {
+    "moment": "^2.16.0",
+    "twitter": "^1.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NerveClasp/perfect-time-to-ukr.git"
+  },
+  "author": "Roman Gorokhov, Kyiv (Ukraine)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NerveClasp/perfect-time-to-ukr/issues"
+  },
+  "homepage": "https://github.com/NerveClasp/perfect-time-to-ukr#readme"
+}
