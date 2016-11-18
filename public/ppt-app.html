@@ -1,0 +1,18 @@
+<link rel="import" href="ppt-login.html">
+<link rel="import" href="bower_components/polymerfire/firebase-app.html">
+<dom-module id="ppt-app">
+  <template>
+    <firebase-app
+      id=<firebase-app auth-domain="perfect-time-to.firebaseapp.com"
+      database-url="https://perfect-time-to.firebaseio.com/"
+      api-key="AIzaSyAPC-f9PZw2ITtpfoAt5YtLNU4SWaWs-uE">
+    </firebase-app>
+    <ppt-login></ppt-login>
+  </template>
+  <script>
+    Polymer({
+      is: "ppt-app",
+
+    });
+  </script>
+</dom-module>

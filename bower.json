@@ -1,0 +1,25 @@
+{
+  "name": "perfect-time-to",
+  "description": "Twitter bot that tweets whenever a time pattern AB:BA is met",
+  "main": "index.js",
+  "authors": [
+    "Roman Horokhov",
+    "Ukraine"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/NerveClasp/perfect-time-to-ukr",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.7.0",
+    "polymerfire": "firebase/polymerfire#^0.10.3",
+    "paper-button": "PolymerElements/paper-button#^1.0.14"
+  }
+}
