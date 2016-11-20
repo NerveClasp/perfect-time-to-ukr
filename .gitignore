@@ -38,4 +38,5 @@ jspm_packages
 config.json
 testTwi.js
 testJSON.json
+watcher.js
 bower_components

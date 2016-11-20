@@ -4,6 +4,7 @@
   "description": "Twitter bot that tweets whenever a time pattern AB:BA is met",
   "main": "index.js",
   "dependencies": {
+    "firebase": "^3.6.1",
     "moment": "^2.16.0",
     "twitter": "^1.4.0"
   },
