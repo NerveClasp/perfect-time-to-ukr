@@ -41,7 +41,7 @@ console.log("Let's get going");
 setInterval(function () {
   for (var k = 0; k < manualSubmit.t.length; k++) {
     let text = manualSubmit.t[k];
-    let tweetsManualRef = ref.child("manual/"+k); // separate section for manually added tweets.
+    let tweetsManualRef = ref.child("manual/"+k+"tweet"); // separate section for manually added tweets.
     let jsonManual = {
       text: text,
       valid: true, // default to 'true' for texts manually submited by you from the textfile
