@@ -15,6 +15,26 @@ let bufferTweets = [ // tweets that are used when there are no new tweets in the
   "всі про мене забули :,( Ну знач наша пісня гарна нóва, починаймо її знову, пра "+owner+" ?"
 ];
 
+//firebase
+const firebase = require('firebase/app');
+const admin = require('firebase-admin');
+require('firebase/auth');
+require('firebase/database-node');
+const configFirebase= require('./configFirebase.json'); // rename the configFirebase0.json and fill it with your data
+const adminCert = require('./admin.json'); // rename admin0.json and fill it with your data
+
+firebase.initializeApp(configFirebase);
+admin.initializeApp({
+  credential: admin.credential.cert(adminCert),
+  databaseURL: "https://perfect-time-to.firebaseio.com" // change the path here
+})
+
+//db
+let db = admin.database();
+let ref = db.ref("perfect/tweets/manual"); // change to the prefered path in your Firebase database
+let tweetsModerated, sn, tMod;
+
+
 var client = new twitter({
   consumer_key: config.consumerKey,
   consumer_secret: config.consumerSecret,
@@ -23,23 +43,40 @@ var client = new twitter({
 });
 
 setInterval(function () { // first the interval is passed, then the code is being executed
+  ref.orderByKey().on("value", function(snapshot){
+    sn = snapshot.numChildren();
+    tweetsModerated = snapshot.val();
+  }, function(errorObject) {
+    console.log("The read failed: "+errorObject.code);
+  });
   let time = moment().format('HH:mm'); // getting the system time
   if(time[0] == time[4] && time[1] == time[3]){ // checking if the current time meets the AB:BA pattern
-    if(tweets.t.length == countMe && bufferCount != bufferTweets.length){ // if the length of available
-      // tweets array is the same, as the number of already tweeted tweets +1 - start using buffer tweets
-      tweet = bufferTweets[bufferCount];
-      bufferCount++;
-      countMe--; // countMe gets increased later in the code, decided to do this terrible trick, sorry
-      console.log("first if "+tweet);
-      console.log(tweets.t[0]+"   __"+tweets.t.length+"__"+countMe);
-    }else if(bufferCount == bufferTweets.length){ // if all buffer tweets were used, start posting old tweets from the beginning
-      countMe = 0;
-      bufferCount = 0;
-      tweet = tweets.t[countMe];
-      console.log("else if "+tweet);
-    }else{ // if there are still available tweets in the queue
-      tweet = tweets.t[countMe];
-      console.log("else "+tweet+" -- "+countMe);
+    // if(tweets.t.length == countMe && bufferCount != bufferTweets.length){ // if the length of available
+    //   // tweets array is the same, as the number of already tweeted tweets +1 - start using buffer tweets
+    //   tweet = bufferTweets[bufferCount];
+    //   bufferCount++;
+    //   countMe--; // countMe gets increased later in the code, decided to do this terrible trick, sorry
+    //   console.log("first if "+tweet);
+    //   console.log(tweets.t[0]+"   __"+tweets.t.length+"__"+countMe);
+    // }else if(bufferCount == bufferTweets.length){ // if all buffer tweets were used, start posting old tweets from the beginning
+    //   countMe = 0;
+    //   bufferCount = 0;
+    //   tweet = tweets.t[countMe];
+    //   console.log("else if "+tweet);
+    // }else{ // if there are still available tweets in the queue
+    //   tweet = tweets.t[countMe];
+    //   console.log("else "+tweet+" -- "+countMe);
+    // }
+    for (var i = 0; i < sn; i++) {
+      let id = "t"+i+"t";
+      let posted = tweetsModerated[id].posted;
+      let valid = tweetsModerated[id].valid;
+      // tweetsModerated
+      if (!posted && valid) {
+        tweet = tweetsModerated[id].text;
+        ref.child(id).update({"posted" : true});
+        break;
+      }
     }
     // if(true){
     client.post('statuses/update', {status: tweet+'\n'+time},  function(error, tweet, response) {

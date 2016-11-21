@@ -18,16 +18,11 @@ admin.initializeApp({
 //db
 let db = admin.database();
 let ref = db.ref("perfect/tweets/manual"); // change to the prefered path in your Firebase database
-let tweetsModerated;
+let tweetsModerated, sn, tMod;
 // ref.once("value", function(snapshot){
 //   tweetsModerated = snapshot.val();
 // })
 
-ref.orderByKey().on("value", function(snapshot){
-  tweetsModerated = snapshot.val();
-}, function(errorObject) {
-  console.log("The read failed: "+errorObject.code);
-});
 
 const moment = require('moment'); // I just love Moment.js. Do not use it here yet though..
 let config = require('./config.json'); // rename config0.json and fill it with your data
@@ -42,16 +37,31 @@ var client = new twitter({
 // new here
 console.log("Let's get going");
 setInterval(function () {
-  // for (var i = 0; i < tweetsModerated.numChildren; i++) {
-    // let cur = tweetsModerated.child(i+"tweet");
-    // if (!cur.posted && cur.valid) {
-    //   console.log(cur.text);
-    //   let childRef = tweetsModerated.child(i+"tweet");
-    //   childRef.update({"posted" : true});
-    //   break;
-    // }
+  ref.orderByKey().on("value", function(snapshot){
+    sn = snapshot.numChildren();
+    tweetsModerated = snapshot.val();
+  }, function(errorObject) {
+    console.log("The read failed: "+errorObject.code);
+  });
+  for (var i = 0; i < sn; i++) {
+    let id = "t"+i+"t";
+    let posted = tweetsModerated[id].posted;
+    let valid = tweetsModerated[id].valid;
+    // tweetsModerated
+    if (posted && valid) {
+      console.log(tweetsModerated[id].text);
+      ref.child(id).update({"posted" : false});
+      break;
+    }
+    // console.log(ref.child(id));
+    console.log("i--"+ref.child(id));
+    console.log("tm--"+tweetsModerated[id].text);
+  }
 
-  // }
-  console.log(tweetsModerated);
+  // console.log(tweetsModerated);
+  // ref.child("t0t").update({
+  //   "posted":true
+  // })
+
 
 }, 3000); // change the frequency of checking for tweets (1000 is 1 second)
