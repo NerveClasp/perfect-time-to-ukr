@@ -6,27 +6,25 @@ const firebase = require('firebase/app');
 const admin = require('firebase-admin');
 require('firebase/auth');
 require('firebase/database-node');
-const configFirebase= require('./configFirebase.json');
-const adminCert = require('./admin.json');
+const configFirebase= require('./configFirebase.json'); // rename the configFirebase0.json and fill it with your data
+const adminCert = require('./admin.json'); // rename admin0.json and fill it with your data
 
 firebase.initializeApp(configFirebase);
 admin.initializeApp({
   credential: admin.credential.cert(adminCert),
-  databaseURL: "https://perfect-time-to.firebaseio.com"
+  databaseURL: "https://perfect-time-to.firebaseio.com" // change the path here
 })
 
 //db
 let db = admin.database();
-let ref = db.ref("server/saving-data/perfect");
+let ref = db.ref("perfect/tweets"); // change to the prefered path in your Firebase database
 
-// let usersRef = ref.child()
 ref.once("value", function(snapshot){
   console.log(snapshot.val());
 })
 
-
-const moment = require('moment');
-let config = require('./config.json');
+const moment = require('moment'); // I just love Moment.js. Do not use it here yet though..
+let config = require('./config.json'); // rename config0.json and fill it with your data
 
 var client = new twitter({
   consumer_key: config.consumerKey,
@@ -34,21 +32,44 @@ var client = new twitter({
   access_token_key: config.accessToken,
   access_token_secret: config.accessTokenSecret
 });
-let tw;
+let searchText = "#perfect_time_ukr"; // change this to whatever you would like to search for
+
+const manualSubmit = require('./testPhrases.json'); // in case you would like to add tweets manually from file
+let validDef = false; //Default value for moderation flag. Set to false if you would like to moderate tweets before posting
+
 console.log("Let's get going");
 setInterval(function () {
+  for (var k = 0; k < manualSubmit.t.length; k++) {
+    let text = manualSubmit.t[k];
+    let tweetsManualRef = ref.child("manual/"+k); // separate section for manually added tweets.
+    let jsonManual = {
+      text: text,
+      valid: true, // default to 'true' for texts manually submited by you from the textfile
+      posted: false, // default 'false' for new tweets added to the database
+      day: "", // placeholder for day of the week
+      date: "", // placeholder for a specific date from parsed tweet
+      time: "", // placeholder for the specific time from parced tweet
+      partOfTheDay: "", // placeholder for a certain part of the day
+    };
+    tweetsManualRef.set(jsonManual); // pushing data to the database
+  }
 
-  client.get('search/tweets', {q: '#perfect_time_ukr'}, function(error, tweets, response) {
-    //  console.log(tweets.statuses[0]);
-     let st = tweets.statuses;
+  client.get('search/tweets', {q: searchText}, function(error, tweets, response) {
+     let st = tweets.statuses; // basically statuses is all we need
      for (var i = 0; i < st.length; i++) {
-       let cur = st[i];
-       let id = cur.id;
-       let tweetsRef = ref.child("tweets/"+id);
+       let cur = st[i]; // current tweet from the tweets array
+       let id = cur.id; // tweet id that is used to add it to the database
+       let tweetsRef = ref.child("unmoderated/"+id); // separate section for found tweets for moderation purposes
        let jsonSet = {
            id_str: cur.id_str,
            text: cur.text,
-           mentioned: cur.entities.user_mentions,
+           valid: validDef,
+           posted: false, // default 'false' for new tweets added to the database
+           day: "", // placeholder for day of the week
+           date: "", // placeholder for a specific date from parsed tweet
+           time: "", // placeholder for the specific time from parced tweet
+           partOfTheDay: "", // placeholder for a certain part of the day
+           mentioned: cur.entities.user_mentions, // handy place to see who was mentioned in the tweet
            in_reply_to_status_id: cur.in_reply_to_status_id,
            in_reply_to_status_id_str: cur.in_reply_to_status_id_str,
            in_reply_to_user_id: cur.in_reply_to_user_id,
@@ -68,11 +89,8 @@ setInterval(function () {
              profile_text_color: cur.user.profile_text_color
            }
        };
-
-      //  let add = JSON.parse(jsonSet);
-       tweetsRef.set(jsonSet); //that's a long json :)
-
-
+       tweetsRef.set(jsonSet); // push found tweets to the database
+       // just for troubleshooting
        console.log(st[i].user.screen_name);
        console.log(st[i].text);
        if (st[i].entities.user_mentions.length > 0) { // makes a list of people who are mentioned in the tweet
@@ -83,7 +101,4 @@ setInterval(function () {
        console.log();
      }
   });
-  // for (var i = 0; i < tw.statuses.length; i++) {
-  //   console.log(tw.statuses[i].user);
-  // }
-}, 10000);
+}, 10000); // change the frequency of checking for tweets (1000 is 1 second)
