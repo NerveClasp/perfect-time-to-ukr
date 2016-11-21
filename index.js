@@ -6,7 +6,7 @@ const moment = require('moment');
 let countMe = 0; // counts how many tweets were tweeted
 let bufferCount = 0; // counts buffer tweets (details below)
 let config = require('./config.json'); //change config0.json and fill in your data
-let tweet = "";
+let tweetText = "";
 let owner = "@NerveClasp"; // for emergency notification of you, the owner :)
 let bufferTweets = [ // tweets that are used when there are no new tweets in the database
   "твітнути щось з тегом #perfect_time_ukr ібо тут вже твіти вигадані "+owner+" закінчуються!",
@@ -50,6 +50,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
     console.log("The read failed: "+errorObject.code);
   });
   let time = moment().format('HH:mm'); // getting the system time
+  // if(true){
   if(time[0] == time[4] && time[1] == time[3]){ // checking if the current time meets the AB:BA pattern
     // if(tweets.t.length == countMe && bufferCount != bufferTweets.length){ // if the length of available
     //   // tweets array is the same, as the number of already tweeted tweets +1 - start using buffer tweets
@@ -67,25 +68,30 @@ setInterval(function () { // first the interval is passed, then the code is bein
     //   tweet = tweets.t[countMe];
     //   console.log("else "+tweet+" -- "+countMe);
     // }
-    for (var i = 0; i < sn; i++) {
+    let found = false;
+    let i = 0;
+    while (i < sn && !found) {
       let id = "t"+i+"t";
       let posted = tweetsModerated[id].posted;
       let valid = tweetsModerated[id].valid;
       // tweetsModerated
       if (!posted && valid) {
-        tweet = tweetsModerated[id].text;
-        ref.child(id).update({"posted" : true});
+        tweetText = tweetsModerated[id].text;
+        console.log(tweetText);
+        client.post('statuses/update', {status: "test:\n"+tweetText+'\n'+time},  function(error, tweet, response) {
+          if(error){
+            /* lol nothing */
+          }else{
+            ref.child(id).update({"posted" : true});
+            console.log(moment().format("HH:mm:ss ")+"tweeted -- "+tweetText);
+            countMe++;
+          }
+        });
+        found = true;
         break;
       }
+      i++;
     }
-    // if(true){
-    client.post('statuses/update', {status: tweet+'\n'+time},  function(error, tweet, response) {
-      if(error){
-        /* lol nothing */
-      }else{
-        console.log(moment().format("HH:mm:ss_")+"tweeted "+tweets.t[countMe]);
-        countMe++;
-      }
-    });
   }
+// }, 5000);
 }, 60000);
