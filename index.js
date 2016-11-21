@@ -41,7 +41,7 @@ var client = new twitter({
   access_token_key: config.accessToken,
   access_token_secret: config.accessTokenSecret
 });
-
+console.log("Initialization successfull. Waiting for the perfect time.. :) ");
 setInterval(function () { // first the interval is passed, then the code is being executed
   ref.orderByKey().on("value", function(snapshot){
     sn = snapshot.numChildren();
@@ -77,12 +77,12 @@ setInterval(function () { // first the interval is passed, then the code is bein
       // tweetsModerated
       if (!posted && valid) {
         tweetText = tweetsModerated[id].text;
+        ref.child(id).update({"posted" : true});
         console.log(tweetText);
-        client.post('statuses/update', {status: "test:\n"+tweetText+'\n'+time},  function(error, tweet, response) {
+        client.post('statuses/update', {status: tweetText+'\n'+time},  function(error, tweet, response) {
           if(error){
             /* lol nothing */
           }else{
-            ref.child(id).update({"posted" : true});
             console.log(moment().format("HH:mm:ss ")+"tweeted -- "+tweetText);
             countMe++;
           }
