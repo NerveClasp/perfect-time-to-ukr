@@ -17,11 +17,37 @@ admin.initializeApp({
 
 //db
 let db = admin.database();
-let ref = db.ref("perfect/tweets/manual"); // change to the prefered path in your Firebase database
+let ref = db.ref("perfect/test"); // change to the prefered path in your Firebase database
 let tweetsModerated, sn, tMod;
 // ref.once("value", function(snapshot){
 //   tweetsModerated = snapshot.val();
 // })
+let count = 0;
+ref.on("value", function(snapshot) {
+  console.log("rOnVal_sn.val: "+snapshot.val());
+})
+
+ref.on("child_added", function(snap, prevChildKey) {
+  count++;
+  console.log("rOnChAdd val: "+snap.val());
+  console.log("rOnChAdd snap.key: "+snap.key);
+  console.log("rOnChAdd prevChKey"+prevChildKey);
+}, function (errorObject) {
+  console.log("Error: "+errorObject.code);
+});
+
+// Get the data on a post that has changed
+ref.on("child_changed", function(snapshot) {
+  var changedPost = snapshot.val();
+  console.log("chCha " + changedPost);
+});
+// Retrieve new posts as they are added to our database
+ref.on("child_added", function(snapshot, prevChildKey) {
+  var newPost = snapshot.val();
+  console.log("Author: " + newPost.author);
+  console.log("Title: " + newPost.title);
+  console.log("Previous Post ID: " + prevChildKey);
+});
 
 
 const moment = require('moment'); // I just love Moment.js. Do not use it here yet though..
@@ -36,6 +62,7 @@ var client = new twitter({
 
 // new here
 console.log("Let's get going");
+/*
 setInterval(function () {
   ref.orderByKey().on("value", function(snapshot){
     sn = snapshot.numChildren();
@@ -48,7 +75,7 @@ setInterval(function () {
     let posted = tweetsModerated[id].posted;
     let valid = tweetsModerated[id].valid;
     // tweetsModerated
-    if (posted && valid) {
+    if (!posted && valid) {
       console.log(tweetsModerated[id].text);
       ref.child(id).update({"posted" : false});
       break;
@@ -65,3 +92,4 @@ setInterval(function () {
 
 
 }, 3000); // change the frequency of checking for tweets (1000 is 1 second)
+*/
