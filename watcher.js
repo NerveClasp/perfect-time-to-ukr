@@ -18,10 +18,9 @@ admin.initializeApp({
 //db
 let db = admin.database();
 let ref = db.ref("perfect/tweets"); // change to the prefered path in your Firebase database
+let refEx = db.ref('perfect/tweets/manual');
+let sn;
 
-ref.once("value", function(snapshot){
-  console.log(snapshot.val());
-})
 
 const moment = require('moment'); // I just love Moment.js. Do not use it here yet though..
 let config = require('./config.json'); // rename config0.json and fill it with your data
@@ -36,12 +35,21 @@ let searchText = "#perfect_time_ukr"; // change this to whatever you would like 
 
 const manualSubmit = require('./testPhrases.json'); // in case you would like to add tweets manually from file
 let validDef = false; //Default value for moderation flag. Set to false if you would like to moderate tweets before posting
-
+refEx.orderByKey().once("value", function(snapshot){
+  sn = snapshot.numChildren();
+  console.log(sn);
+  // tweetsModerated = snapshot.val();
+}, function(errorObject) {
+  console.log("The read failed: "+errorObject.code);
+});
 console.log("Let's get going");
 setInterval(function () {
+
   for (var k = 0; k < manualSubmit.t.length; k++) {
+
     let text = manualSubmit.t[k];
-    let tweetsManualRef = ref.child("manual/t"+k+"t"); // separate section for manually added tweets.
+    let id = k+sn;
+    let tweetsManualRef = ref.child("manual/t"+id+"t"); // separate section for manually added tweets.
     let jsonManual = {
       text: text,
       valid: true, // default to 'true' for texts manually submited by you from the textfile
@@ -52,6 +60,7 @@ setInterval(function () {
       partOfTheDay: "", // placeholder for a certain part of the day
     };
     tweetsManualRef.set(jsonManual); // pushing data to the database
+    console.log("pushed "+text);
   }
 
   client.get('search/tweets', {q: searchText}, function(error, tweets, response) {
@@ -91,8 +100,8 @@ setInterval(function () {
        };
        tweetsRef.set(jsonSet); // push found tweets to the database
        // just for troubleshooting
-       console.log(st[i].user.screen_name);
-       console.log(st[i].text);
+      //  console.log(st[i].user.screen_name);
+      //  console.log(st[i].text);
        if (st[i].entities.user_mentions.length > 0) { // makes a list of people who are mentioned in the tweet
          for (var j = 0; j < st[j].entities.user_mentions.length; j++) {
            console.log("--for "+st[i].entities.user_mentions[j].screen_name);
@@ -101,4 +110,5 @@ setInterval(function () {
        console.log();
      }
   });
-}, 10000); // change the frequency of checking for tweets (1000 is 1 second)
+  console.log("==== Are we done? ====?");
+}, 30000); // change the frequency of checking for tweets (1000 is 1 second)
