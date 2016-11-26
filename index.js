@@ -3,6 +3,7 @@ const twitter = require('twitter');
 const tweets = require('./testPhrases.json');
 const moment = require('moment');
 
+let lastTweetedTime = "";
 let countMe = 0; // counts how many tweets were tweeted
 let bufferCount = 0; // counts buffer tweets (details below)
 let config = require('./config.json'); //change config0.json and fill in your data
@@ -51,7 +52,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
   });
   let time = moment().format('HH:mm'); // getting the system time
   // if(true){
-  if(time[0] == time[4] && time[1] == time[3]){ // checking if the current time meets the AB:BA pattern
+  if(time[0] == time[4] && time[1] == time[3] && time != lastTweetedTime){ // checking if the current time meets the AB:BA pattern
     // if(tweets.t.length == countMe && bufferCount != bufferTweets.length){ // if the length of available
     //   // tweets array is the same, as the number of already tweeted tweets +1 - start using buffer tweets
     //   tweet = bufferTweets[bufferCount];
@@ -84,6 +85,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
             /* lol nothing */
           }else{
             console.log(moment().format("HH:mm:ss ")+"tweeted -- "+tweetText);
+            lastTweetedTime = time;
             countMe++;
           }
         });
@@ -94,4 +96,4 @@ setInterval(function () { // first the interval is passed, then the code is bein
     }
   }
 // }, 5000);
-}, 60000);
+}, 30000);
