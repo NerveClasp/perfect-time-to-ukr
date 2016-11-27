@@ -22,6 +22,25 @@ let tweetsModerated, sn, tMod;
 // ref.once("value", function(snapshot){
 //   tweetsModerated = snapshot.val();
 // })
+for (var i = 0; i < 15; i++) {
+  let refChild = ref.child(i);
+  var json = {
+        name: "name"+i,
+        text: "bla bla bla "+i,
+        author: "NerveClasp",
+        title: "The Best Title ever "+i,
+        posted: false,
+        valid: true
+  }
+  refChild.on('value', (snap) => {
+    if (snap.val() == null) {
+      refChild.set(json);
+    }
+  });
+
+
+
+}
 let count = 0;
 ref.on("value", function(snapshot) {
   console.log("rOnVal_sn.val: "+snapshot.val());
