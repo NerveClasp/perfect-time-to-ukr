@@ -1,13 +1,14 @@
 const fs = require('fs');
 const twitter = require('twitter');
 const tweets = require('./testPhrases.json');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const http = require('http');
 
-let lat = 50.000992;
-let lng = 26.417630;
+let conf = require('./config.json'); //change config0.json and fill in your data
+const timeZone = conf.timeZone;
+
 let date = "today";
-let path = "/json?lat="+lat+"&lng="+lng+"&date="+date;
+let path = "/json?lat="+conf.lat+"&lng="+conf.lng+"&date="+date+"&formatted=0";
 
 let sunInfoOpt = {
   host: "api.sunrise-sunset.org",
@@ -16,7 +17,6 @@ let sunInfoOpt = {
 
 let lastTweetedTime = "";
 let bufferCount = 0; // counts buffer tweets (details below)
-let conf = require('./config.json'); //change config0.json and fill in your data
 let tweetText = "";
 let owner = "@NerveClasp"; // for emergency notification of you, the owner :)
 let bufferTweets = [ // tweets that are used when there are no new tweets in the database
@@ -53,6 +53,20 @@ var client = new twitter({
   access_token_secret: conf.config.accessTokenSecret
 });
 console.log("Initialization successfull. Waiting for the perfect time.. :) ");
+function dateToMoment(date) {
+  return moment(new Date(date)).tz(timeZone).format("HH:mm:ss");
+}
+function secondsToHours(sec){
+  var sec_num = parseInt(sec, 10); // don't forget the second param
+  var hours   = Math.floor(sec_num / 3600);
+  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+  var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+  if (hours   < 10) {hours   = "0"+hours;}
+  if (minutes < 10) {minutes = "0"+minutes;}
+  if (seconds < 10) {seconds = "0"+seconds;}
+  return hours+':'+minutes+':'+seconds;
+}
 setInterval(function () { // first the interval is passed, then the code is being executed
   ref.orderByKey().on("value", function(snapshot){
     sn = snapshot.numChildren();
@@ -60,7 +74,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
   }, function(errorObject) {
     console.log("The read failed: "+errorObject.code);
   });
-  let time = moment().format('HH:mm'); // getting the system time
+  let time = moment().tz(timeZone).format('HH:mm'); // getting the system time
   if (time == "00:00" && time != lastTweetedTime) {
     http.request(sunInfoOpt, function(response) {
       let str = '';
@@ -82,9 +96,9 @@ setInterval(function () { // first the interval is passed, then the code is bein
         // зустріти схід і захід сонця! DD.MM.YYYY 🌅 - HH:mm:ss AM 😎 - HH:mm:ss AM 🌆 - HH:mm:ss PM Тривалість сонячного дня - HH:mm:ss HH:mm
         if (res.status == "OK") {
           tweetText = "зустріти схід і захід сонця!\n";
-          tweetText += moment().format("DD.MM.YYYY")+"\n🌅 - "+res.results.sunrise;
-          tweetText += "\n😎 - "+res.results.solar_noon+"\n🌆 - "+res.results.sunset;
-          tweetText += "\nТривалість сонячного дня - "+res.results.day_length;
+          tweetText += moment().tz(timeZone).format("DD.MM.YYYY")+"\n🌅 - "+dateToMoment(res.results.sunrise);
+          tweetText += "\n😎 - "+dateToMoment(res.results.solar_noon)+"\n🌆 - "+dateToMoment(res.results.sunset);
+          tweetText += "\nТривалість сонячного дня - "+secondsToHours(res.results.day_length);
         }else{
           tweetText = "перевірити що не так з отриманням часу сходу і заходу сонця⁉️❎😕"
         }
@@ -92,7 +106,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
           if(error){
             /* lol nothing */
           }else{
-            console.log(moment().format("HH:mm:ss ")+"tweeted -- "+tweetText);
+            console.log(moment().tz(timeZone).format("HH:mm:ss ")+"tweeted -- "+tweetText);
             lastTweetedTime = time;
           }
         });
@@ -117,7 +131,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
           if(error){
             /* lol nothing */
           }else{
-            console.log(moment().format("HH:mm:ss ")+"tweeted -- "+tweetText);
+            console.log(moment().tz(timeZone).format("HH:mm:ss ")+"tweeted -- "+tweetText);
             lastTweetedTime = time;
           }
         });

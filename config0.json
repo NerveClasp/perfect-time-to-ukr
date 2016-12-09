@@ -23,5 +23,10 @@
     "databaseURL": "",
     "storageBucket": "",
     "messagingSenderId": ""
+  },
+  "timeZone": "Europe/Kiev",
+  "location": {
+    "lat": 50.451179,
+    "lng": 30.522167
   }
 }

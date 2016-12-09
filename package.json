@@ -6,7 +6,7 @@
   "dependencies": {
     "firebase": "^3.6.1",
     "firebase-admin": "^4.0.2",
-    "moment": "^2.16.0",
+    "moment-timezone": "^0.5.10",
     "twitter": "^1.4.0"
   },
   "devDependencies": {},
