@@ -2,6 +2,17 @@ const fs = require('fs');
 const twitter = require('twitter');
 const tweets = require('./testPhrases.json');
 const moment = require('moment');
+const http = require('http');
+
+let lat = 50.000992;
+let lng = 26.417630;
+let date = "today";
+let path = "/json?lat="+lat+"&lng="+lng+"&date="+date;
+
+let sunInfoOpt = {
+  host: "api.sunrise-sunset.org",
+  path: path
+};
 
 let lastTweetedTime = "";
 let countMe = 0; // counts how many tweets were tweeted
@@ -51,24 +62,48 @@ setInterval(function () { // first the interval is passed, then the code is bein
     console.log("The read failed: "+errorObject.code);
   });
   let time = moment().format('HH:mm'); // getting the system time
-  // if(true){
-  if(time[0] == time[4] && time[1] == time[3] && time != lastTweetedTime){ // checking if the current time meets the AB:BA pattern
-    // if(tweets.t.length == countMe && bufferCount != bufferTweets.length){ // if the length of available
-    //   // tweets array is the same, as the number of already tweeted tweets +1 - start using buffer tweets
-    //   tweet = bufferTweets[bufferCount];
-    //   bufferCount++;
-    //   countMe--; // countMe gets increased later in the code, decided to do this terrible trick, sorry
-    //   console.log("first if "+tweet);
-    //   console.log(tweets.t[0]+"   __"+tweets.t.length+"__"+countMe);
-    // }else if(bufferCount == bufferTweets.length){ // if all buffer tweets were used, start posting old tweets from the beginning
-    //   countMe = 0;
-    //   bufferCount = 0;
-    //   tweet = tweets.t[countMe];
-    //   console.log("else if "+tweet);
-    // }else{ // if there are still available tweets in the queue
-    //   tweet = tweets.t[countMe];
-    //   console.log("else "+tweet+" -- "+countMe);
-    // }
+  if (time == "00:00" && time != lastTweetedTime) {
+    http.request(options, function(response) {
+      let str = '';
+      response.on('data', function(chunk) {
+        str += chunk;
+      })
+      response.on('end', function() {
+        let res = JSON.parse(str);
+        /*
+        {"results":{"sunrise":"6:01:28 AM","sunset":"2:12:38 PM",
+        "solar_noon":"10:07:03 AM","day_length":"08:11:10",
+        "civil_twilight_begin":"5:23:29 AM",
+        "civil_twilight_end":"2:50:36 PM",
+        "nautical_twilight_begin":"4:42:12 AM",
+        "nautical_twilight_end":"3:31:54 PM",
+        "astronomical_twilight_begin":"4:02:55 AM",
+        "astronomical_twilight_end":"4:11:11 PM"},"status":"OK"}
+        */
+        // зустріти схід і захід сонця! DD.MM.YYYY 🌅 - HH:mm:ss AM 😎 - HH:mm:ss AM 🌆 - HH:mm:ss PM Тривалість сонячного дня - HH:mm:ss HH:mm
+        if (res.status == "OK") {
+          tweetText = "зустріти схід і захід сонця!\n";
+          tweetText += moment().format("DD.MM.YYYY")+"\n🌅 - "+res.results.sunrise;
+          tweetText += "\n😎 - "+res.results.solar_noon+"\n🌆 - "+res.results.sunset;
+          tweetText += "\nТривалість сонячного дня - "+res.results.day_length;
+        }else{
+          tweetText = "перевірити що не так з отриманням часу сходу і заходу сонця⁉️❎😕"
+        }
+        client.post('statuses/update', {status: tweetText+'\n'+time},  function(error, tweet, response) {
+          if(error){
+            /* lol nothing */
+          }else{
+            console.log(moment().format("HH:mm:ss ")+"tweeted -- "+tweetText);
+            lastTweetedTime = time;
+            countMe++;
+          }
+        });
+      })
+    }).end();
+
+    found = true;
+  }
+  if(time[0] == time[4] && time[1] == time[3] && time != lastTweetedTime && time != "00:00"){ // checking if the current time meets the AB:BA pattern
     let found = false;
     let i = 0;
     while (i < sn && !found) {
@@ -95,5 +130,5 @@ setInterval(function () { // first the interval is passed, then the code is bein
       i++;
     }
   }
-// }, 5000);
+  // }, 5000);
 }, 30000);
