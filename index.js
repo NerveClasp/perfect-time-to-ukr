@@ -15,7 +15,6 @@ let sunInfoOpt = {
 };
 
 let lastTweetedTime = "";
-let countMe = 0; // counts how many tweets were tweeted
 let bufferCount = 0; // counts buffer tweets (details below)
 let conf = require('./config.json'); //change config0.json and fill in your data
 let tweetText = "";
@@ -63,7 +62,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
   });
   let time = moment().format('HH:mm'); // getting the system time
   if (time == "00:00" && time != lastTweetedTime) {
-    http.request(options, function(response) {
+    http.request(sunInfoOpt, function(response) {
       let str = '';
       response.on('data', function(chunk) {
         str += chunk;
@@ -95,7 +94,6 @@ setInterval(function () { // first the interval is passed, then the code is bein
           }else{
             console.log(moment().format("HH:mm:ss ")+"tweeted -- "+tweetText);
             lastTweetedTime = time;
-            countMe++;
           }
         });
       })
@@ -121,7 +119,6 @@ setInterval(function () { // first the interval is passed, then the code is bein
           }else{
             console.log(moment().format("HH:mm:ss ")+"tweeted -- "+tweetText);
             lastTweetedTime = time;
-            countMe++;
           }
         });
         found = true;
