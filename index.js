@@ -6,7 +6,7 @@ const moment = require('moment');
 let lastTweetedTime = "";
 let countMe = 0; // counts how many tweets were tweeted
 let bufferCount = 0; // counts buffer tweets (details below)
-let config = require('./config.json'); //change config0.json and fill in your data
+let conf = require('./config.json'); //change config0.json and fill in your data
 let tweetText = "";
 let owner = "@NerveClasp"; // for emergency notification of you, the owner :)
 let bufferTweets = [ // tweets that are used when there are no new tweets in the database
@@ -21,12 +21,12 @@ const firebase = require('firebase/app');
 const admin = require('firebase-admin');
 require('firebase/auth');
 require('firebase/database-node');
-const configFirebase= require('./configFirebase.json'); // rename the configFirebase0.json and fill it with your data
-const adminCert = require('./admin.json'); // rename admin0.json and fill it with your data
+// const configFirebase= require('./configFirebase.json'); // rename the configFirebase0.json and fill it with your data
+// const adminCert = require('./admin.json'); // rename admin0.json and fill it with your data
 
-firebase.initializeApp(configFirebase);
+firebase.initializeApp(conf.configFirebase);
 admin.initializeApp({
-  credential: admin.credential.cert(adminCert),
+  credential: admin.credential.cert(conf.admin),
   databaseURL: "https://perfect-time-to.firebaseio.com" // change the path here
 })
 
@@ -37,10 +37,10 @@ let tweetsModerated, sn, tMod;
 
 
 var client = new twitter({
-  consumer_key: config.consumerKey,
-  consumer_secret: config.consumerSecret,
-  access_token_key: config.accessToken,
-  access_token_secret: config.accessTokenSecret
+  consumer_key: conf.config.consumerKey,
+  consumer_secret: conf.config.consumerSecret,
+  access_token_key: conf.config.accessToken,
+  access_token_secret: conf.config.accessTokenSecret
 });
 console.log("Initialization successfull. Waiting for the perfect time.. :) ");
 setInterval(function () { // first the interval is passed, then the code is being executed
