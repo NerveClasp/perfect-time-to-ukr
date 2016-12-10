@@ -42,6 +42,10 @@
 .info{
   color: #121c26;
 }
+.card-actions{
+  @apply(--layout-horizontal);
+  @apply(--layout-wrap);
+}
 </style>
 <template>
   <firebase-auth user="{{user}}"></firebase-auth>
@@ -63,7 +67,7 @@
               <div class="autores">[[tweet.text]]</div>
             </div>
           </div>
-          <div class="card-actions" id="userinfo">
+          <div class="card-actions, layout horizontal" id="userinfo">
             <paper-button disabled id="edit" key="[[textUpdateInput]]"
             tweet=[[tweet]] on-tap="animated.open()">
             Edit
