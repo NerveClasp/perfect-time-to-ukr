@@ -9,18 +9,33 @@
       width: 300px;
       background-color: #3c3c3c;
     }
+    h1{
+      font-family: monospace;
+      text-align: center;
+      border: 10px;
+      border-width: 0px;
+      border-radius: 2px;
+      background-color: #609bd1;
+      color: #3d3d3d;
+      /*display: flex;*/
+      flex-direction: row;
+      padding: 12px;
+      margin: 6px;
+    }
     </style>
     <firebase-auth
       id="auth" user="{{user}}" status-known="{{statusKnown}}"
       provider="google">
     </firebase-auth>
-    <div id="welcome" hidden$="[[user]]">
+    <h1>
+    <div id="welcome-home" hidden$="[[user]]">
       <paper-button class="centered" raised on-tap="login" hidden$="[[user]]">Come inside</paper-button>
     </div>
     <paper-button raised on-tap="logout" hidden$="[[!user]]">Leave</paper-button>
     <template is="dom-if" if="[[user]]">
       Вітаннячко в консолі 'Ідеального Часу Щоб..', [[user.displayName]]
     </template>
+    </h1>
   </template>
   <script>
   Polymer({

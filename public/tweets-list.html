@@ -23,6 +23,8 @@
   @apply(--layout-flex);
 }
 .autores{
+  display:block;;
+  vertical-align: middle;
   padding: 0 0 0 1.28em;
   width: 100%;
 }
@@ -38,13 +40,19 @@
   min-width: 2.57em;
   align-self: center;
   padding-left: 5px;
+  padding-right: 0.57em;
+  border-radius: 3px;
+  margin: 0.29em;
 }
 .info{
-  color: #121c26;
+  color: #3a5d7e;
+  text-align: center;
+  padding-left: 1.28em;
+  font-family: monospace;
 }
 .card-actions{
   @apply(--layout-horizontal);
-  @apply(--layout-wrap);
+  align-items: center;
 }
 </style>
 <template>
@@ -67,7 +75,7 @@
               <div class="autores">[[tweet.text]]</div>
             </div>
           </div>
-          <div class="card-actions, layout horizontal" id="userinfo">
+          <div class="card-actions" id="userinfo">
             <paper-button disabled id="edit" key="[[textUpdateInput]]"
             tweet=[[tweet]] on-tap="animated.open()">
             Edit
