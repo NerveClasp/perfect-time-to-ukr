@@ -5,11 +5,15 @@
   <template>
     <style>
     #welcome-home{
+      /*margin-top: -64px;*/
+      align-self: auto;
       font-family: Junegull, monospace;
-      height: 300px;
-      width: 300px;
+      border-radius: 50%;
+      height: 200px;
+      width: 200px;
       color: #3d3d3d;
       background-color: #609bd1;
+      box-shadow:
     }
     .wrapper{
       font-family: Junegull, monospace;
@@ -28,9 +32,10 @@
       id="auth" user="{{user}}" status-known="{{statusKnown}}"
       provider="google">
     </firebase-auth>
-    <div class="wrapper">
+    <paper-button id="welcome-home" class="centered" raised on-tap="login" hidden$="[[user]]">Come inside</paper-button>
+    <div class="wrapper" hidden$="[[!user]]">
     <div class="welcome-home" hidden$="[[user]]">
-      <paper-button id="welcome-home" class="centered" raised on-tap="login" hidden$="[[user]]">Come inside</paper-button>
+
     </div>
     <paper-button raised on-tap="logout" hidden$="[[!user]]">Leave</paper-button>
     <template is="dom-if" if="[[user]]">
