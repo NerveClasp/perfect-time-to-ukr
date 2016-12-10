@@ -1,0 +1,116 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<dom-module id="tweet-add">
+
+<style is="custom-style" include="iron-flex">
+.container {
+  @apply(--layout-horizontal);
+  @apply(--layout-wrap);
+}
+.text{
+  @apply(--layout-flex);
+}
+.card-container{
+  padding: 6px;
+}
+.addtweet{
+  @apply(--layout-flex);
+}
+.autores{
+  padding: 0 10% 0 2%;
+  width: 80%;
+}
+.userpic{
+  border-radius: 50%;
+  background-position: center center;
+}
+.userpic-container{
+  width: 5.14em;
+  height: 5.14em;
+  min-width: 5.14em;
+  align-self: center;
+  padding-left: 5px;
+}
+
+</style>
+<template>
+  <firebase-auth user="{{user}}"></firebase-auth>
+  <firebase-query
+  id="query"
+  path="/staged/tweets"
+  data={{tweets}}>
+</firebase-query>
+<div id="card">
+  <div id="tweets" class="layout vertical">
+    <div class="card-container layout horizontal">
+      <paper-card id="add" class="addtweet">
+        <div class="card-content">
+          <div class="container, layout horizontal">
+            <div class="userpic-container">
+              <img class="userpic" src=[[user.photoURL]] width="100%" height="100%"/>
+            </div>
+            <paper-textarea
+            id="textarea"
+            label="Type your tweet here"
+            class="autores"
+            maxlength="136"
+            char-counter>
+          </paper-textarea>
+        </div>
+      </div>
+      <div class="card-actions">
+        <paper-button raised id="add" on-tap="add">Add</paper-button>
+      </div>
+    </paper-card>
+  </div>
+ </div>
+</div>
+</template>
+<script>
+Polymer({
+  is: 'tweet-add',
+  properties: {
+    tweets: {
+      type: Object
+    },
+    user:{
+      type: Object
+    }
+  },
+  add: function() {
+    this.$.query.ref.push({
+      text: this.$.textarea.value,
+      text_orig: this.$.textarea.value,
+      valid: false,
+      posted: false,
+      author: this.user.displayName,
+      author_email: this.user.email,
+      lastEdit: this.user.displayName,
+      lastEdit_email: this.user.email,
+      photoURL: this.user.photoURL,
+      date:"",
+      partOfTheDay: "",
+      time:"",
+      day:"",
+      timeDate:"",
+      timeDay:"",
+      id:0,
+      id_str:"",
+      from:{
+        id:0, id_str:"", name: "", profile_background_color:"", profile_background_image_url:"",
+        profile_image_url:"", profile_link_color:"", profile_sidebar_border_color:"",
+        profile_sidebar_fill_color:"", profile_text_color:"", screen_name:""
+      }
+    });
+    this.$.textarea.value = null;
+    console.log(this.user);
+  }
+});
+</script>
+</dom-module>

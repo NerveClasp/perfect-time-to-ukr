@@ -6,6 +6,7 @@ const http = require('http');
 
 let conf = require('./config.json'); //change config0.json and fill in your data
 const timeZone = conf.timeZone;
+const sunRiseSetTime = "00:00";
 
 let date = "today";
 let path = "/json?lat="+conf.lat+"&lng="+conf.lng+"&date="+date+"&formatted=0";
@@ -34,6 +35,7 @@ require('firebase/database-node');
 // const configFirebase= require('./configFirebase.json'); // rename the configFirebase0.json and fill it with your data
 // const adminCert = require('./admin.json'); // rename admin0.json and fill it with your data
 
+//Uncomment to initialize
 firebase.initializeApp(conf.configFirebase);
 admin.initializeApp({
   credential: admin.credential.cert(conf.admin),
@@ -75,7 +77,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
     console.log("The read failed: "+errorObject.code);
   });
   let time = moment().tz(timeZone).format('HH:mm'); // getting the system time
-  if (time == "00:00" && time != lastTweetedTime) {
+  if (time == sunRiseSetTime && time != lastTweetedTime) {
     http.request(sunInfoOpt, function(response) {
       let str = '';
       response.on('data', function(chunk) {
@@ -115,7 +117,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
 
     found = true;
   }
-  if(time[0] == time[4] && time[1] == time[3] && time != lastTweetedTime && time != "00:00"){ // checking if the current time meets the AB:BA pattern
+  if(time[0] == time[4] && time[1] == time[3] && time != lastTweetedTime && time != sunRiseSetTime){ // checking if the current time meets the AB:BA pattern
     let found = false;
     let i = 0;
     while (i < sn && !found) {

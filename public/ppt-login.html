@@ -3,13 +3,22 @@
 <link rel="stylesheet" href="style.css" media="screen" title="no title">
 <dom-module id="ppt-login">
   <template>
+    <style>
+    #welcome{
+      height: 300px;
+      width: 300px;
+      background-color: #3c3c3c;
+    }
+    </style>
     <firebase-auth
       id="auth" user="{{user}}" status-known="{{statusKnown}}"
       provider="google">
     </firebase-auth>
-
-    <paper-button class="centered" raised on-tap="login" hidden$="[[user]]">Come inside</paper-button>
-    <paper-button raised on-tap="logout" hidden$="[[!user]]">Leave</paper-button> <template is="dom-if" if="[[user]]">
+    <div id="welcome" hidden$="[[user]]">
+      <paper-button class="centered" raised on-tap="login" hidden$="[[user]]">Come inside</paper-button>
+    </div>
+    <paper-button raised on-tap="logout" hidden$="[[!user]]">Leave</paper-button>
+    <template is="dom-if" if="[[user]]">
       Вітаннячко в консолі 'Ідеального Часу Щоб..', [[user.displayName]]
     </template>
   </template>

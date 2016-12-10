@@ -1,18 +1,40 @@
 <link rel="import" href="ppt-login.html">
+<link rel="import" href="tweet-add.html">
+<link rel="import" href="tweets-list.html">
 <link rel="import" href="bower_components/polymerfire/firebase-app.html">
+<!-- <link rel="import" href="bower_components/polymerfire/firebase-auth.html"> -->
 <dom-module id="ppt-app">
+  <style>
+    h1{
+      font-family: monospace;
+      text-align: center;
+    }
+  </style>
   <template>
     <firebase-app
-      id=<firebase-app auth-domain="perfect-time-to.firebaseapp.com"
+      auth-domain="perfect-time-to.firebaseapp.com"
       database-url="https://perfect-time-to.firebaseio.com/"
       api-key="AIzaSyAPC-f9PZw2ITtpfoAt5YtLNU4SWaWs-uE">
     </firebase-app>
+    <firebase-auth user="{{user}}"></firebase-auth>
     <ppt-login></ppt-login>
+    <template is="dom-if" if="[[user]]">
+      <tweet-add></tweet-add>
+      <h1>Tweets in Queue</h1>
+      <tweets-list></tweets-list>
+    </template>
   </template>
   <script>
     Polymer({
       is: "ppt-app",
-
+      properties: {
+        user: {
+          type: Object
+        },
+        statusKnown: {
+          type: Object
+        }
+      }
     });
   </script>
 </dom-module>

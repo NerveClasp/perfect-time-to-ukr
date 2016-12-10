@@ -21,7 +21,7 @@ let refEx = db.ref('perfect/tweets/manual');
 let sn;
 
 
-const moment = require('moment'); // I just love Moment.js. Do not use it here yet though..
+const moment = require('moment-timezone'); // I just love Moment.js. Do not use it here yet though..
 
 var client = new twitter({
   consumer_key: conf.consumerKey,

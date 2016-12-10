@@ -1,0 +1,140 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<dom-module id="tweets-list" path="">
+<style is="custom-style" include="iron-flex">
+.container {
+  @apply(--layout-horizontal);
+  @apply(--layout-wrap);
+}
+.text{
+  @apply(--layout-flex);
+}
+.card-container{
+  padding: 6px;
+}
+.pcard{
+  @apply(--layout-flex);
+}
+.autores{
+  padding: 0 0 0 1.28em;
+  width: 100%;
+}
+.userpic{
+  border-radius: 50%;
+  background-position: center center;
+  /*align-items: center;*/
+  margin-left: 1.28em;
+}
+.userpic-container{
+  width: 5.14em;
+  height: 2.57em;
+  min-width: 2.57em;
+  align-self: center;
+  padding-left: 5px;
+}
+.info{
+  color: #121c26;
+}
+</style>
+<template>
+  <firebase-auth user="{{user}}"></firebase-auth>
+  <firebase-query
+  id="query"
+  path="/staged/tweets"
+  data={{tweets}}>
+</firebase-query>
+<div id="card">
+  <div id="tweets" class="layout vertical">
+    <template is="dom-repeat" items="[[tweets]]" as="tweet">
+      <div class="card-container layout horizontal">
+        <paper-card id="[[tweet.time]]" class="pcard">
+          <div class="card-content">
+            <div class="container, layout horizontal">
+              <div class="userpic-container">
+                <img class="userpic" src=[[tweet.photoURL]] width="32px" height="32px"/>
+              </div>
+              <div class="autores">[[tweet.text]]</div>
+            </div>
+          </div>
+          <div class="card-actions" id="userinfo">
+            <paper-button disabled id="edit" key="[[textUpdateInput]]"
+            tweet=[[tweet]] on-tap="animated.open()">
+            Edit
+          </paper-button>
+          <paper-dialog id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Edit Tweet [[tweet.$id]]</h2>
+            <p>[[tweet.text]]</p>
+            </paper-dialog>
+            <div class="info">
+
+            <template is="dom-if" if="[[admin.email]]"  restamp="true">
+              You are admin!
+            </template>
+            <template is="dom-if" if="[[tweet.valid]]" restamp="true">
+              ✔️
+            </template>
+            <template is="dom-if" if="[[!tweet.valid]]" restamp="true">
+              👓
+            </template>
+            Author: [[tweet.author]] | Last Edit: [[tweet.lastEdit]]
+            </div>
+
+          </div>
+        </div>
+      </paper-card>
+    </div>
+  </template>
+</div>
+</div>
+</template>
+<script>
+Polymer({
+  is: 'tweets-list',
+  properties: {
+    tweets: {
+      type: Object
+    },
+    user:{
+      type: Object
+    },
+    show: {
+      type: Boolean,
+      value: false
+    },
+    admin:{
+      type: Boolean,
+      value: false
+    },
+    up: function() {
+      console.log(user);
+    },
+  },
+  // ready: function() {
+  // this.admin = new Boolean(this.user.email == "nerveclasp@gmail.com");
+  // console.log(this);
+  // },
+  edit: function(e){
+    var key = e.currentTarget.tweet.$key;
+    console.log(e.currentTarget.key);
+    // this.$.query.ref.child(key).update({
+    //   text: this.$[key].value
+    // })
+  },
+  update: function() {
+    this.$.query.ref.push({
+      text: this.$.textedit.value,
+      valid: true,
+      posted: false
+    });
+    // this.$.input.value = null;
+  }
+});
+</script>
+</dom-module>
