@@ -4,16 +4,27 @@
 <dom-module id="ppt-login">
   <template>
     <style>
-    #welcome-home{
+    .welcome-home{
+      /*@apply(--layout-vertical);*/
       /*margin-top: -64px;*/
-      align-self: auto;
+      /*align-self: auto;*/
       font-family: Junegull, monospace;
       border-radius: 50%;
-      height: 200px;
-      width: 200px;
+      height: 128px;
+      width: 128px;
       color: #3d3d3d;
       background-color: #609bd1;
       box-shadow:
+    }
+    #google{
+      float: left;
+    }
+    #twitter{
+      float: right;
+    }
+    .loginContainer{
+      height: 128px;
+      width: 280px;
     }
     .wrapper{
       font-family: Junegull, monospace;
@@ -29,15 +40,27 @@
     }
     </style>
     <firebase-auth
-      id="auth" user="{{user}}" status-known="{{statusKnown}}"
+      id="authGoogle" user="{{user}}" status-known="{{statusKnown}}"
       provider="google">
     </firebase-auth>
-    <paper-button id="welcome-home" class="centered" raised on-tap="login" hidden$="[[user]]">Come inside</paper-button>
+    <firebase-auth
+      id="authTwitter" user="{{user}}"
+      provider="twitter">
+    </firebase-auth>
+    <div class="loginContainer centered">
+      <paper-button id="twitter" class="welcome-home" raised on-tap="loginGoogle" hidden$="[[user]]">
+        <img src="./img/gray_twitter.png" alt="Login with Twitter" />
+      </paper-button>
+      <paper-button id="google" class="welcome-home" raised on-tap="loginTwitter" hidden$="[[user]]">
+        <img src="./img/red_google.png" alt="Login with Google" />
+      </paper-button>
+    </div>
     <div class="wrapper" hidden$="[[!user]]">
     <div class="welcome-home" hidden$="[[user]]">
 
     </div>
-    <paper-button raised on-tap="logout" hidden$="[[!user]]">Leave</paper-button>
+    <paper-button raised on-tap="logoutGoogle" hidden$="[[google]]">Leave</paper-button>
+    <paper-button raised on-tap="logoutTwitter" hidden$="[[twitter]]">Leave</paper-button>
     <template is="dom-if" if="[[user]]">
       Вітаннячко в консолі 'Ідеального Часу Щоб..', [[user.displayName]]
     </template>
@@ -52,13 +75,31 @@
       },
       statusKnown: {
         type: Object
+      },
+      google:{
+        type: Boolean,
+        value: false
+      },
+      twitter:{
+        type: Boolean,
+        value: false
       }
     },
-    login: function() {
-      return this.$.auth.signInWithPopup();
+    loginGoogle: function() {
+      this.google = true;
+      return this.$.authGoogle.signInWithPopup();
     },
-    logout: function() {
-      return this.$.auth.signOut();
+    logoutGoogle: function() {
+      this.google = false;
+      return this.$.authGoogle.signOut();
+    },
+    loginTwitter: function() {
+      this.twitter = true;
+      return this.$.authTwitter.signInWithPopup();
+    },
+    logoutTwitter: function() {
+      this.twitter = false;
+      return this.$.authTwitter.signOut();
     }
   });
   </script>

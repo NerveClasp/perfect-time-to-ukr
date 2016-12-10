@@ -82,18 +82,23 @@ Polymer({
     },
     user:{
       type: Object
+    },
+    valid:{
+      type: Boolean,
+      value: false
     }
   },
   add: function() {
     this.$.query.ref.push({
       text: this.$.textarea.value,
       text_orig: this.$.textarea.value,
-      valid: false,
+      text_last: this.$.textarea.value,
+      valid: this.valid,
       posted: false,
       author: this.user.displayName,
-      author_email: this.user.email,
+      author_uid: this.user.uid,
       lastEdit: this.user.displayName,
-      lastEdit_email: this.user.email,
+      lastEdit_uid: this.user.uid,
       photoURL: this.user.photoURL,
       date:"",
       partOfTheDay: "",
