@@ -1,6 +1,9 @@
 <link rel="import" href="bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
 <link rel="stylesheet" href="style.css" media="screen" title="no title">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
 <dom-module id="ppt-login">
   <template>
   <style>
@@ -27,16 +30,34 @@
     width: 280px;
   }
   .wrapper{
-    font-family: Junegull, monospace;
+    margin: 0;
+
     border: 10px;
     border-width: 0px;
     border-radius: 2px;
     background-color: #609bd1;
     color: #3d3d3d;
-    /*display: flex;*/
-    flex-direction: row;
     padding: 12px;
     margin: 6px;
+    align-items: center;
+  }
+  .welcome{
+    display: inline-block;
+    position:relative;
+    align-content: center;
+    vertical-align: middle;
+    padding: 5px 0 0 1.28em;
+    /*top: 50%;*/
+    /*left: 50%;*/
+    /*margin-top: -64px;*/
+    /*margin-left: -50%;*/
+  }
+  .pcard{
+    /*@apply(--layout-horizontal);*/
+    width: 100%;
+    background-color: #609bd1;
+    /*@apply(--layout-flex);*/
+    font-family: Junegull, monospace;
   }
   </style>
   <firebase-auth
@@ -55,16 +76,20 @@ provider="twitter">
     <img src="./img/red_google.png" alt="Login with Google" />
   </paper-button>
 </div>
-<div class="wrapper" hidden$="[[!user]]">
-  <div class="welcome-home" hidden$="[[user]]">
+<div class="wrapper, layout horizontal" hidden$="[[!user]]">
+  <!-- <div class="welcome-home, layout horizontal"> -->
+  <paper-card class="pcard">
+    <div class="card-content"><paper-button raised on-tap="logout" hidden$="[[!user]]">Leave</paper-button>
+    <template is="dom-if" if="[[user]]">
+      <div class="welcome">
+        [[user.displayName]], вітаннячко в консолі 'Ідеального Часу Щоб..'
+      </div>
+    </template></div>
+    <!-- <div class="card-actions"></div> -->
+  </paper-card>
+  <!-- <paper-button raised on-tap="logoutGoogle" hidden$="[[!user]]">Leave</paper-button> -->
 
-  </div>
-  <paper-button raised on-tap="logoutGoogle" hidden$="[[!google]]">Leave</paper-button>
-  <paper-button raised on-tap="logoutTwitter" hidden$="[[!twitter]]">Leave</paper-button>
-  <template is="dom-if" if="[[user]]">
-    <img class="userpic" src=[[user.photoURL]]/>
-    [[user.displayName]], вітаннячко в консолі 'Ідеального Часу Щоб..'
-  </template>
+  <!-- </div> -->
 </div>
 </template>
 <script>
@@ -98,9 +123,9 @@ Polymer({
     this.twitter = true;
     return this.$.authTwitter.signInWithPopup();
   },
-  logoutTwitter: function() {
+  logout: function() {
     this.twitter = false;
-    return this.$.authTwitter.signOut();
+    return this.$.authGoogle.signOut();
   }
 });
 </script>
