@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'OpenGostA';
+    src: local('OpenGost Type A TT Regular'), local('OpenGostTypeATT-Regular'),
+    url('opengosttypeattregular.woff2') format('woff2'),
+    url('opengosttypeattregular.woff') format('woff'),
+    url('opengosttypeattregular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
