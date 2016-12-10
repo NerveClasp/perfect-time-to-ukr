@@ -3,104 +3,105 @@
 <link rel="stylesheet" href="style.css" media="screen" title="no title">
 <dom-module id="ppt-login">
   <template>
-    <style>
-    .welcome-home{
-      /*@apply(--layout-vertical);*/
-      /*margin-top: -64px;*/
-      /*align-self: auto;*/
-      font-family: Junegull, monospace;
-      border-radius: 50%;
-      height: 128px;
-      width: 128px;
-      color: #3d3d3d;
-      background-color: #609bd1;
-      box-shadow:
-    }
-    #google{
-      float: left;
-    }
-    #twitter{
-      float: right;
-    }
-    .loginContainer{
-      height: 128px;
-      width: 280px;
-    }
-    .wrapper{
-      font-family: Junegull, monospace;
-      border: 10px;
-      border-width: 0px;
-      border-radius: 2px;
-      background-color: #609bd1;
-      color: #3d3d3d;
-      /*display: flex;*/
-      flex-direction: row;
-      padding: 12px;
-      margin: 6px;
-    }
-    </style>
-    <firebase-auth
-      id="authGoogle" user="{{user}}" status-known="{{statusKnown}}"
-      provider="google">
-    </firebase-auth>
-    <firebase-auth
-      id="authTwitter" user="{{user}}"
-      provider="twitter">
-    </firebase-auth>
-    <div class="loginContainer centered">
-      <paper-button id="twitter" class="welcome-home" raised on-tap="loginTwitter" hidden$="[[user]]">
-        <img src="./img/gray_twitter.png" alt="Login with Twitter" />
-      </paper-button>
-      <paper-button id="google" class="welcome-home" raised on-tap="loginGoogle" hidden$="[[user]]">
-        <img src="./img/red_google.png" alt="Login with Google" />
-      </paper-button>
-    </div>
-    <div class="wrapper" hidden$="[[!user]]">
-    <div class="welcome-home" hidden$="[[user]]">
+  <style>
+  .welcome-home{
+    /*@apply(--layout-vertical);*/
+    /*margin-top: -64px;*/
+    /*align-self: auto;*/
+    font-family: Junegull, monospace;
+    border-radius: 50%;
+    height: 128px;
+    width: 128px;
+    color: #3d3d3d;
+    background-color: #609bd1;
+    box-shadow:
+  }
+  #google{
+    float: left;
+  }
+  #twitter{
+    float: right;
+  }
+  .loginContainer{
+    height: 128px;
+    width: 280px;
+  }
+  .wrapper{
+    font-family: Junegull, monospace;
+    border: 10px;
+    border-width: 0px;
+    border-radius: 2px;
+    background-color: #609bd1;
+    color: #3d3d3d;
+    /*display: flex;*/
+    flex-direction: row;
+    padding: 12px;
+    margin: 6px;
+  }
+  </style>
+  <firebase-auth
+  id="authGoogle" user="{{user}}" status-known="{{statusKnown}}"
+  provider="google">
+</firebase-auth>
+<firebase-auth
+id="authTwitter" user="{{user}}"
+provider="twitter">
+</firebase-auth>
+<div class="loginContainer centered">
+  <paper-button id="twitter" class="welcome-home" raised on-tap="loginTwitter" hidden$="[[user]]">
+    <img src="./img/gray_twitter.png" alt="Login with Twitter" />
+  </paper-button>
+  <paper-button id="google" class="welcome-home" raised on-tap="loginGoogle" hidden$="[[user]]">
+    <img src="./img/red_google.png" alt="Login with Google" />
+  </paper-button>
+</div>
+<div class="wrapper" hidden$="[[!user]]">
+  <div class="welcome-home" hidden$="[[user]]">
 
-    </div>
-    <paper-button raised on-tap="logoutGoogle" hidden$="[[!google]]">Leave</paper-button>
-    <paper-button raised on-tap="logoutTwitter" hidden$="[[!twitter]]">Leave</paper-button>
-    <template is="dom-if" if="[[user]]">
-      Вітаннячко в консолі 'Ідеального Часу Щоб..', [[user.displayName]]
-    </template>
   </div>
+  <paper-button raised on-tap="logoutGoogle" hidden$="[[!google]]">Leave</paper-button>
+  <paper-button raised on-tap="logoutTwitter" hidden$="[[!twitter]]">Leave</paper-button>
+  <template is="dom-if" if="[[user]]">
+    <img class="userpic" src=[[user.photoURL]]/>
+    [[user.displayName]], вітаннячко в консолі 'Ідеального Часу Щоб..'
   </template>
-  <script>
-  Polymer({
-    is: "ppt-login",
-    properties: {
-      user: {
-        type: Object
-      },
-      statusKnown: {
-        type: Object
-      },
-      google:{
-        type: Boolean,
-        value: false
-      },
-      twitter:{
-        type: Boolean,
-        value: false
-      }
+</div>
+</template>
+<script>
+Polymer({
+  is: "ppt-login",
+  properties: {
+    user: {
+      type: Object
     },
-    loginGoogle: function() {
-      this.google = true;
-      return this.$.authGoogle.signInWithPopup();
+    statusKnown: {
+      type: Object
     },
-    logoutGoogle: function() {
-      this.google = false;
-      return this.$.authGoogle.signOut();
+    google:{
+      type: Boolean,
+      value: false
     },
-    loginTwitter: function() {
-      this.twitter = true;
-      return this.$.authTwitter.signInWithPopup();
-    },
-    logoutTwitter: function() {
-      this.twitter = false;
-      return this.$.authTwitter.signOut();
+    twitter:{
+      type: Boolean,
+      value: false
     }
-  });
-  </script>
+  },
+  loginGoogle: function() {
+    this.google = true;
+    return this.$.authGoogle.signInWithPopup();
+  },
+  logoutGoogle: function() {
+    this.google = false;
+    return this.$.authGoogle.signOut();
+  },
+  loginTwitter: function() {
+    this.twitter = true;
+    return this.$.authTwitter.signInWithPopup();
+  },
+  logoutTwitter: function() {
+    this.twitter = false;
+    return this.$.authTwitter.signOut();
+  }
+});
+</script>
 </dom-module>
