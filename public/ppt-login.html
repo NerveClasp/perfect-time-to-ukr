@@ -59,8 +59,8 @@
     <div class="welcome-home" hidden$="[[user]]">
 
     </div>
-    <paper-button raised on-tap="logoutGoogle" hidden$="[[google]]">Leave</paper-button>
-    <paper-button raised on-tap="logoutTwitter" hidden$="[[twitter]]">Leave</paper-button>
+    <paper-button raised on-tap="logoutGoogle" hidden$="[[!google]]">Leave</paper-button>
+    <paper-button raised on-tap="logoutTwitter" hidden$="[[!twitter]]">Leave</paper-button>
     <template is="dom-if" if="[[user]]">
       Вітаннячко в консолі 'Ідеального Часу Щоб..', [[user.displayName]]
     </template>
