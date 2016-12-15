@@ -4,6 +4,11 @@ const tweets = require('./testPhrases.json');
 const moment = require('moment-timezone');
 const http = require('http');
 
+// twi profile picture
+// https://pbs.twimg.com/profile_images/805985209896337408/YhCeQsO5.jpg
+// twi api picture
+// http://pbs.twimg.com/profile_images/805985209896337408/YhCeQsO5_normal.jpg
+
 let conf = require('./config.json'); //change config0.json and fill in your data
 const timeZone = conf.timeZone;
 const sunRiseSetTime = "00:00";

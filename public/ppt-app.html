@@ -6,6 +6,7 @@
 <dom-module id="ppt-app">
   <style>
     h1{
+      display: block;
       font-family: Junegull, monospace;
       text-align: center;
       border: 10px;
@@ -16,7 +17,7 @@
       /*display: flex;*/
       flex-direction: row;
       padding: 12px;
-      margin: 6px;
+      margin: 0;
     }
   </style>
   <template>
@@ -29,7 +30,7 @@
     <ppt-login></ppt-login>
     <template is="dom-if" if="[[user]]">
       <tweet-add></tweet-add>
-      <h1>Tweets in Queue</h1>
+      <!-- <h1>Tweets in Queue</h1> -->
       <tweets-list></tweets-list>
     </template>
   </template>

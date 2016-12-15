@@ -1,4 +1,5 @@
-{ created_at: 'Sun Nov 20 23:24:24 +0000 2016',
+
+{ created_at: 'Sun Nov 20 23:24:24 +0000 2016',*/
   id: 800479937815789600,
   id_str: '800479937815789570',
   text: '#perfect_time_ukr\nзгадати, що в стіралці лежать речі!\nДля @erast_stiebbel в неділю ввечері',
@@ -68,3 +69,4 @@
   favorited: false,
   retweeted: false,
   lang: 'uk' }
+*/

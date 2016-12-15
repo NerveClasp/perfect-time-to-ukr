@@ -5,69 +5,75 @@
 <link rel="import" href="bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="bower_components/paper-card/paper-card.html">
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="stylesheet" href="style.css" media="screen" title="no title">
 
 <dom-module id="tweet-add">
 
 <style is="custom-style" include="iron-flex">
 .container {
   @apply(--layout-horizontal);
-  @apply(--layout-wrap);
-}
-.text{
-  @apply(--layout-flex);
-}
-.card-container{
-  padding: 6px;
+  align-items: baseline;
+  /*@apply(--layout-wrap);*/
 }
 .addtweet{
   @apply(--layout-flex);
 }
-.tweet-text{
-  padding: 0 10% 0 2%;
-  width: 80%;
-  font-family: Comfortaa, sans-serif;
+
+.card-actions{
+  @apply(--layout-vertical);
+  @apply(--layout-flex);
 }
-.userpic{
-  border-radius: 50%;
-  background-position: center center;
+#textarea{
+  --paper-input-container-focus-color: #609bd1;
+  width: 100%;
+}
+#button-container{
+  align-self: flex-end;
+  padding-left: 6px;
+  padding-bottom: 21px;
 }
 .userpic-container{
-  width: 5.14em;
-  height: 5.14em;
-  min-width: 5.14em;
-  align-self: center;
-  padding-left: 5px;
+  align-self: flex-end;
+  padding-bottom: 21px;
 }
-
 </style>
 <template>
-  <firebase-auth user="{{user}}"></firebase-auth>
+  <firebase-auth id="usr" user="{{user}}"></firebase-auth>
   <firebase-query
-  id="query"
-  path="/staged/tweets"
-  data={{tweets}}>
-</firebase-query>
+    id="query"
+    path="/staged/tweets"
+    data={{tweets}}>
+  </firebase-query>
+  <firebase-query
+    id="queryUser"
+    path="/users"
+    data={{users}}>
+  </firebase-query>
 <div id="card">
   <div id="tweets" class="layout vertical">
-    <div class="card-container layout horizontal">
+    <div class="list-container layout vertical">
       <paper-card id="add" class="addtweet">
         <div class="card-content">
           <div class="container, layout horizontal">
             <div class="userpic-container">
-              <img class="userpic" src=[[user.photoURL]] width="100%" height="100%"/>
+              <img class="userpic" id="up" src="[[photo(user.photoURL)]]" width="64px" height="64px"/>
             </div>
             <paper-textarea
             id="textarea"
+            textinput={{textinput}}
             label="Type your tweet here"
             class="tweet-text"
             maxlength="136"
             char-counter>
           </paper-textarea>
+          <div id="button-container" checklen={{textinput::change}}>
+          <paper-button raised class="button" id="add-button" on-tap="add">Add</paper-button>
+          </div>
         </div>
       </div>
-      <div class="card-actions">
-        <paper-button raised id="add" on-tap="add">Add</paper-button>
-      </div>
+      <!-- <div class="card-actions">
+        <paper-button raised class="button" id="add-button" on-tap="add">Add</paper-button>
+      </div> -->
     </paper-card>
   </div>
  </div>
@@ -81,15 +87,35 @@ Polymer({
       type: Object
     },
     user:{
-      type: Object
+      type: Object,
     },
     valid:{
       type: Boolean,
-      value: false
+      value: true
+    },
+    photoURL:{
+      type: String,
+      value: ""
+    }
+  },
+  photo: function(link) {
+    if (link != null) {
+      let up = link.split("/");
+      if(up[0] == "http:"){
+        let name = up[5].split("_");
+        return "https://pbs.twimg.com/profile_images/"+up[4]+"/"+name[0]+".jpg";
+      }else{
+        return link;
+      }
     }
   },
   add: function() {
-    this.$.query.ref.push({
+    let obj = "";
+    let photoURL = this.twiPhoto(this.user.photoURL);
+    //if anonymous -  set author to Anonymous
+    //                set photoURL to some pic
+    //                leave uid for statistics?
+    obj = {
       text: this.$.textarea.value,
       text_orig: this.$.textarea.value,
       text_last: this.$.textarea.value,
@@ -99,7 +125,15 @@ Polymer({
       author_uid: this.user.uid,
       lastEdit: this.user.displayName,
       lastEdit_uid: this.user.uid,
-      photoURL: this.user.photoURL,
+      photoURL: photoURL,
+      queued: false,
+      order: 0-Date.now()
+    };
+    if(true){
+      // obj.date = "13.12.2016";
+      // obj.order = 0-Date.now();
+    }
+    let extra = {
       date:"",
       partOfTheDay: "",
       time:"",
@@ -113,9 +147,46 @@ Polymer({
         profile_image_url:"", profile_link_color:"", profile_sidebar_border_color:"",
         profile_sidebar_fill_color:"", profile_text_color:"", screen_name:""
       }
+    }
+    if (this.$.textarea.value == null) {
+      this.$.textarea.label = "You gotta write something first :)";
+    }else if(this.$.textarea.value.length < 5){
+      this.$.textarea.label = "Can you write anything longer than that?..";
+    }else{
+      this.$.textarea.label = "Thank you so much! Perfect timing! More of the same please ;)";
+      this.$.query.ref.push(obj);
+      this.$.textarea.value = null;
+    }
+    this.userDB()
+    // console.log(this.user);
+  },
+  userDB: function() {
+    let usr = this.user;
+    let photo = this.twiPhoto(usr.photoURL);
+    let q = this.$.queryUser.ref.child(usr.uid);
+    q.once("value", function(snap){
+      if(!snap.exists()){
+        q.set({uid: usr.uid,
+              type: "user",
+              displayName: usr.displayName,
+              photoURL: photo
+            });
+      }else {
+        q.update({displayName: usr.displayName, photoURL: photo});
+        console.log("user exists");
+      }
+    }, function(errorObject) {
+      console.log("The read failed: "+errorObject.code);
     });
-    this.$.textarea.value = null;
-    console.log(this.user);
+  },
+  twiPhoto(link){
+    let up = link.split("/");
+    if(up[0] == "http:"){
+      let name = up[5].split("_");
+      return "https://pbs.twimg.com/profile_images/"+up[4]+"/"+name[0]+".jpg";
+    }else{
+      return link;
+    }
   }
 });
 </script>
