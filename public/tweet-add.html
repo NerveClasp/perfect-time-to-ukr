@@ -13,7 +13,6 @@
 .container {
   @apply(--layout-horizontal);
   align-items: baseline;
-  /*@apply(--layout-wrap);*/
 }
 .addtweet{
   @apply(--layout-flex);
@@ -71,9 +70,6 @@
           </div>
         </div>
       </div>
-      <!-- <div class="card-actions">
-        <paper-button raised class="button" id="add-button" on-tap="add">Add</paper-button>
-      </div> -->
     </paper-card>
   </div>
  </div>
@@ -129,10 +125,6 @@ Polymer({
       queued: false,
       order: 0-Date.now()
     };
-    if(true){
-      // obj.date = "13.12.2016";
-      // obj.order = 0-Date.now();
-    }
     let extra = {
       date:"",
       partOfTheDay: "",
@@ -158,7 +150,6 @@ Polymer({
       this.$.textarea.value = null;
     }
     this.userDB()
-    // console.log(this.user);
   },
   userDB: function() {
     let usr = this.user;
@@ -183,7 +174,7 @@ Polymer({
     let up = link.split("/");
     if(up[0] == "http:"){
       let name = up[5].split("_");
-      return "https://pbs.twimg.com/profile_images/"+up[4]+"/"+name[0]+".jpg";
+      return "https://pbs.twimg.com/profile_images/"+up[4]+"/"+name[0]+".jpg"; //fixing the odd twitter user pic link..
     }else{
       return link;
     }

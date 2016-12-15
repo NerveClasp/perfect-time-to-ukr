@@ -4,47 +4,45 @@
 <link rel="import" href="bower_components/polymerfire/firebase-app.html">
 <!-- <link rel="import" href="bower_components/polymerfire/firebase-auth.html"> -->
 <dom-module id="ppt-app">
-  <style>
-    h1{
-      display: block;
-      font-family: Junegull, monospace;
-      text-align: center;
-      border: 10px;
-      border-width: 0px;
-      border-radius: 2px;
-      background-color: #609bd1;
-      color: #3d3d3d;
-      /*display: flex;*/
-      flex-direction: row;
-      padding: 12px;
-      margin: 0;
+<style>
+h1{
+  display: block;
+  font-family: Junegull, monospace;
+  text-align: center;
+  border: 10px;
+  border-width: 0px;
+  border-radius: 2px;
+  background-color: #609bd1;
+  color: #3d3d3d;
+  flex-direction: row;
+  padding: 12px;
+  margin: 0;
+}
+</style>
+<template>
+  <firebase-app
+  auth-domain="perfect-time-to.firebaseapp.com"
+  database-url="https://perfect-time-to.firebaseio.com/"
+  api-key="AIzaSyAPC-f9PZw2ITtpfoAt5YtLNU4SWaWs-uE">
+</firebase-app>
+<firebase-auth user="{{user}}"></firebase-auth>
+<ppt-login></ppt-login>
+<template is="dom-if" if="[[user]]">
+  <tweet-add></tweet-add>
+  <tweets-list></tweets-list>
+</template>
+</template>
+<script>
+Polymer({
+  is: "ppt-app",
+  properties: {
+    user: {
+      type: Object
+    },
+    statusKnown: {
+      type: Object
     }
-  </style>
-  <template>
-    <firebase-app
-      auth-domain="perfect-time-to.firebaseapp.com"
-      database-url="https://perfect-time-to.firebaseio.com/"
-      api-key="AIzaSyAPC-f9PZw2ITtpfoAt5YtLNU4SWaWs-uE">
-    </firebase-app>
-    <firebase-auth user="{{user}}"></firebase-auth>
-    <ppt-login></ppt-login>
-    <template is="dom-if" if="[[user]]">
-      <tweet-add></tweet-add>
-      <!-- <h1>Tweets in Queue</h1> -->
-      <tweets-list></tweets-list>
-    </template>
-  </template>
-  <script>
-    Polymer({
-      is: "ppt-app",
-      properties: {
-        user: {
-          type: Object
-        },
-        statusKnown: {
-          type: Object
-        }
-      }
-    });
-  </script>
+  }
+});
+</script>
 </dom-module>

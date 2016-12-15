@@ -37,30 +37,30 @@
   align-items: center;
 }
 /*.tweet-text{
-  display:block;
-  vertical-align: middle;
-  padding: 5px 0 0 1.28em;
-  width: 100%;
-  font-family: Comfortaa, sans-serif;
+display:block;
+vertical-align: middle;
+padding: 5px 0 0 1.28em;
+width: 100%;
+font-family: Comfortaa, sans-serif;
 
 }*/
 #name{
   padding: 0;
 }
 /*.userpic{
-  border-radius: 50%;
-  background-position: center center;
-  margin-left: 1.28em;
+border-radius: 50%;
+background-position: center center;
+margin-left: 1.28em;
 }
 .userpic-container{
-  width: 5.14em;
-  height: 2.57em;
-  min-width: 2.57em;
-  align-self: center;
-  padding-left: 5px;
-  padding-right: 0.57em;
-  border-radius: 3px;
-  margin: 0.29em;
+width: 5.14em;
+height: 2.57em;
+min-width: 2.57em;
+align-self: center;
+padding-left: 5px;
+padding-right: 0.57em;
+border-radius: 3px;
+margin: 0.29em;
 }*/
 .info{
   @apply(--layout-horizontal);
@@ -95,94 +95,88 @@
 <template>
   <firebase-auth user="{{user}}"></firebase-auth>
   <firebase-query
-    id="staged"
-    limit-to-first={{limitToFirst}}
-    order-by-child="order"
-    path="/staged/tweets"
-    data={{staged}}>
-  </firebase-query>
-  <firebase-query
-    id="queue"
-    path="/queue"
-    data={{queued}}>
-  </firebase-query>
-  <firebase-query
-    id="tweeted"
-    path="/tweeted/tweets"
-    data={{tweeted}}>
-  </firebase-query>
-<!-- <div id="card"> -->
-  <div id="tweets" class="layout vertical">
-    <div class="list-container">
+  id="staged"
+  limit-to-first={{limitToFirst}}
+  order-by-child="order"
+  path="/staged/tweets"
+  data={{staged}}>
+</firebase-query>
+<firebase-query
+id="queue"
+path="/queue"
+data={{queued}}>
+</firebase-query>
+<firebase-query
+id="tweeted"
+path="/tweeted/tweets"
+data={{tweeted}}>
+</firebase-query>
+<div id="tweets" class="layout vertical">
+  <div class="list-container">
     <paper-card id="name" class="pcard">
-      <!-- <div class="card-content"> -->
-        <!-- <div class="list-container"> -->
-          <div class="tweet-text" id="name"><h1>Tweets in Queue</h1></div>
-        <!-- </div> -->
-      <!-- </div> -->
+      <div class="tweet-text" id="name"><h1>Tweets in Queue</h1></div>
     </paper-card>
-    </div>
-    <template is="dom-repeat" items="[[staged]]" as="tweet">
-      <div class="list-container">
-        <paper-card id="[[tweet.time]]" class="pcard">
-          <div class="card-content">
-            <div class="container, layout horizontal">
-              <div class="userpic-container">
-                <img class="userpic" src=[[tweet.photoURL]] width="64px" height="64px"/>
-              </div>
-              <div class="tweet-text">[[tweet.text]]</div>
+  </div>
+  <template is="dom-repeat" items="[[staged]]" as="tweet">
+    <div class="list-container">
+      <paper-card id="[[tweet.time]]" class="pcard">
+        <div class="card-content">
+          <div class="container, layout horizontal">
+            <div class="userpic-container">
+              <img class="userpic" src=[[tweet.photoURL]] width="64px" height="64px"/>
             </div>
+            <div class="tweet-text">[[tweet.text]]</div>
           </div>
-          <div class="card-actions" id="userinfo">
+        </div>
+        <div class="card-actions" id="userinfo">
 
           <paper-dialog id="animated" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
             <h2>Edit Tweet [[tweet.$id]]</h2>
             <p>[[tweet.text]]</p>
-            </paper-dialog>
-            <div class="info">
-              <div class="info-details" style="text-align: left;">
-                Status:
-                <template is="dom-if" if="[[admin.email]]"  restamp="true">
+          </paper-dialog>
+          <div class="info">
+            <div class="info-details" style="text-align: left;">
+              Status:
+              <template is="dom-if" if="[[admin.email]]"  restamp="true">
                 You are admin!
-                </template>
-                <template is="dom-if" if="[[tweet.posted]]" restamp="true">
+              </template>
+              <template is="dom-if" if="[[tweet.posted]]" restamp="true">
                 Posted
-                </template>
-                <template is="dom-if" if="[[tweet.queued]]" restamp="true">
+              </template>
+              <template is="dom-if" if="[[tweet.queued]]" restamp="true">
                 In The Queue
-                </template>
-                <template is="dom-if" if="[[!tweet.valid]]" restamp="true">
+              </template>
+              <template is="dom-if" if="[[!tweet.valid]]" restamp="true">
                 Waiting
-                </template>
-              </div>
-              <div class="info-details">
+              </template>
+            </div>
+            <div class="info-details">
               Author: [[tweet.author]]
-              </div>
-              <!-- <div class="info-details">
-              Last Edit: [[tweet.lastEdit]]
-              </div> -->
-
             </div>
-            <!-- <paper-button disabled id="edit" key="[[textUpdateInput]]"
-              tweet=[[tweet]] on-tap="animated.open()">
-              Edit
-            </paper-button> -->
-            </div>
-          </paper-card>
+            <!-- <div class="info-details">
+            Last Edit: [[tweet.lastEdit]]
+          </div> -->
 
-        <!-- </div> -->
-        <!-- </div> -->
-      </div>
-  </template>
-  <paper-card class="list-container">
-    <div class="card-actions">
-      <paper-button raised class="card-actions" id="load-more" on-tap="loadmore">
-        Load More
-      </paper-button>
+        </div>
+        <!-- <paper-button disabled id="edit" key="[[textUpdateInput]]"
+        tweet=[[tweet]] on-tap="animated.open()">
+        Edit
+      </paper-button> -->
     </div>
   </paper-card>
+
+  <!-- </div> -->
+  <!-- </div> -->
 </div>
-<!-- </div> -->
+</template>
+<paper-card class="list-container">
+  <div class="card-actions">
+    <paper-button raised class="card-actions" id="load-more" on-tap="loadmore">
+      Load More
+    </paper-button>
+  </div>
+</paper-card>
+</div>
 </template>
 <script>
 Polymer({
