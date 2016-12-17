@@ -1,6 +1,7 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="bower_components/polymerfire/firebase-document.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="bower_components/paper-card/paper-card.html">
@@ -78,15 +79,14 @@
     path="/staged/tweets"
     data={{staged}}>
   </firebase-query>
-  <firebase-query
-    id="queue"
-    limit-to-first={{limitToFirst}}
-    order-by-child="order"
-    path="/queue/pile"
-    data={{queued}}>
-  </firebase-query>
+  <firebase-document
+    id="userdb"
+    path="/users/[[user.uid]]"
+    data={{userdb}}>
+  </firebase-document>
   <firebase-query
     id="tweeted"
+    limit-to-first={{limitToFirst}}
     path="/tweeted/tweets"
     data={{tweeted}}>
   </firebase-query>
@@ -140,10 +140,18 @@
           </div> -->
 
         </div>
-        <paper-button raised id="approve" key="[[textUpdateInput]]"
-        tweet=[[tweet]] on-tap="approve">
-        Approve
-      </paper-button>
+        <template is="dom-if" if="[[sameuser]]" restamp="true">
+          <paper-button raised id="edit" key="[[textUpdateInput]]"
+            user=[[user]] on-tap="edit">
+            Edit
+          </paper-button>
+        </template>
+        <template is="dom-if" if="[[userdb.admin]]" restamp="true">
+          <paper-button raised id="approve" key="[[textUpdateInput]]"
+            tweet=[[tweet]] on-tap="approve">
+            Approve
+          </paper-button>
+        </template>
     </div>
   </paper-card>
 
@@ -177,6 +185,9 @@ Polymer({
     user:{
       type: Object
     },
+    userdb:{
+      type: Object
+    },
     show: {
       type: Boolean,
       value: false
@@ -193,6 +204,9 @@ Polymer({
       value: 5
     }
   },
+  sameuser: function() {
+
+  },
   approve: function(e){
     console.log(e.currentTarget.tweet);
     let tweet = e.currentTarget.tweet;
@@ -208,6 +222,7 @@ Polymer({
     // console.log(e.currentTarget.tweet);
   },
   loadmore(){
+    console.log(this.userdb);
     this.limitToFirst += 5;
   },
   // ready: function() {
