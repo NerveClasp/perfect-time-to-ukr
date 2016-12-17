@@ -79,6 +79,11 @@
     path="/staged/tweets"
     data={{staged}}>
   </firebase-query>
+  <firebase-query
+    id="queue"
+    path="/queue/pile"
+    data={{queue}}>
+  </firebase-query>
   <firebase-document
     id="userdb"
     path="/users/[[user.uid]]"
@@ -196,19 +201,12 @@ Polymer({
       type: Boolean,
       value: false
     },
-    up: function() {
-      console.log(user);
-    },
     limitToFirst:{
       type: Number,
       value: 5
     }
   },
-  sameuser: function() {
-
-  },
   approve: function(e){
-    console.log(e.currentTarget.tweet);
     let tweet = e.currentTarget.tweet;
     let obj = {
       author_uid: tweet.author_uid,
@@ -222,7 +220,6 @@ Polymer({
     // console.log(e.currentTarget.tweet);
   },
   loadmore(){
-    console.log(this.userdb);
     this.limitToFirst += 5;
   },
   // ready: function() {
@@ -231,7 +228,6 @@ Polymer({
   // },
   edit: function(e){
     var key = e.currentTarget.tweet.$key;
-    console.log(e.currentTarget.key);
     // this.$.query.ref.child(key).update({
     //   text: this.$[key].value
     // })

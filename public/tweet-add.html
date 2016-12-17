@@ -164,7 +164,6 @@ Polymer({
             });
       }else {
         q.update({displayName: usr.displayName, photoURL: photo});
-        console.log("user exists");
       }
     }, function(errorObject) {
       console.log("The read failed: "+errorObject.code);
