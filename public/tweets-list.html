@@ -36,32 +36,9 @@
   /*@apply(--layout-vertical);*/
   align-items: center;
 }
-/*.tweet-text{
-display:block;
-vertical-align: middle;
-padding: 5px 0 0 1.28em;
-width: 100%;
-font-family: Comfortaa, sans-serif;
-
-}*/
 #name{
   padding: 0;
 }
-/*.userpic{
-border-radius: 50%;
-background-position: center center;
-margin-left: 1.28em;
-}
-.userpic-container{
-width: 5.14em;
-height: 2.57em;
-min-width: 2.57em;
-align-self: center;
-padding-left: 5px;
-padding-right: 0.57em;
-border-radius: 3px;
-margin: 0.29em;
-}*/
 .info{
   @apply(--layout-horizontal);
   color: #3a5d7e;
@@ -95,22 +72,24 @@ margin: 0.29em;
 <template>
   <firebase-auth user="{{user}}"></firebase-auth>
   <firebase-query
-  id="staged"
-  limit-to-first={{limitToFirst}}
-  order-by-child="order"
-  path="/staged/tweets"
-  data={{staged}}>
-</firebase-query>
-<firebase-query
-id="queue"
-path="/queue"
-data={{queued}}>
-</firebase-query>
-<firebase-query
-id="tweeted"
-path="/tweeted/tweets"
-data={{tweeted}}>
-</firebase-query>
+    id="staged"
+    limit-to-first={{limitToFirst}}
+    order-by-child="order"
+    path="/staged/tweets"
+    data={{staged}}>
+  </firebase-query>
+  <firebase-query
+    id="queue"
+    limit-to-first={{limitToFirst}}
+    order-by-child="order"
+    path="/queue/pile"
+    data={{queued}}>
+  </firebase-query>
+  <firebase-query
+    id="tweeted"
+    path="/tweeted/tweets"
+    data={{tweeted}}>
+  </firebase-query>
 <div id="tweets" class="layout vertical">
   <div class="list-container">
     <paper-card id="name" class="pcard">
@@ -125,7 +104,10 @@ data={{tweeted}}>
             <div class="userpic-container">
               <img class="userpic" src=[[tweet.photoURL]] width="64px" height="64px"/>
             </div>
-            <div class="tweet-text">[[tweet.text]]</div>
+            <template is="dom-if" if="{{editthis}}" restamp="true">
+
+            </template>
+            <div class="tweet-text" hidden$="[[true]]">[[tweet.text]]</div>
           </div>
         </div>
         <div class="card-actions" id="userinfo">
@@ -146,7 +128,7 @@ data={{tweeted}}>
               <template is="dom-if" if="[[tweet.queued]]" restamp="true">
                 In The Queue
               </template>
-              <template is="dom-if" if="[[!tweet.valid]]" restamp="true">
+              <template is="dom-if" if="[[!tweet.queued]]" restamp="true">
                 Waiting
               </template>
             </div>
@@ -158,10 +140,10 @@ data={{tweeted}}>
           </div> -->
 
         </div>
-        <!-- <paper-button disabled id="edit" key="[[textUpdateInput]]"
-        tweet=[[tweet]] on-tap="animated.open()">
-        Edit
-      </paper-button> -->
+        <paper-button raised id="approve" key="[[textUpdateInput]]"
+        tweet=[[tweet]] on-tap="approve">
+        Approve
+      </paper-button>
     </div>
   </paper-card>
 
@@ -211,6 +193,20 @@ Polymer({
       value: 5
     }
   },
+  approve: function(e){
+    console.log(e.currentTarget.tweet);
+    let tweet = e.currentTarget.tweet;
+    let obj = {
+      author_uid: tweet.author_uid,
+      key: tweet.$key,
+      order: tweet.order,
+      text: tweet.text
+    }
+    this.$.queue.ref.child(e.currentTarget.tweet.$key).set(obj);
+    this.$.staged.ref.child(e.currentTarget.tweet.$key).update({queued: true});
+    // console.log(this);
+    // console.log(e.currentTarget.tweet);
+  },
   loadmore(){
     this.limitToFirst += 5;
   },
@@ -234,5 +230,8 @@ Polymer({
     // this.$.input.value = null;
   }
 });
+function edittweet(tweet) {
+  console.log(tweet);
+}
 </script>
 </dom-module>

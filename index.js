@@ -4,11 +4,6 @@ const tweets = require('./testPhrases.json');
 const moment = require('moment-timezone');
 const http = require('http');
 
-// twi profile picture
-// https://pbs.twimg.com/profile_images/805985209896337408/YhCeQsO5.jpg
-// twi api picture
-// http://pbs.twimg.com/profile_images/805985209896337408/YhCeQsO5_normal.jpg
-
 let conf = require('./config.json'); //change config0.json and fill in your data
 const timeZone = conf.timeZone;
 const sunRiseSetTime = "00:00";
@@ -22,23 +17,14 @@ let sunInfoOpt = {
 };
 
 let lastTweetedTime = "";
-let bufferCount = 0; // counts buffer tweets (details below)
 let tweetText = "";
 let owner = "@NerveClasp"; // for emergency notification of you, the owner :)
-let bufferTweets = [ // tweets that are used when there are no new tweets in the database
-  "твітнути щось з тегом #perfect_time_ukr ібо тут вже твіти вигадані "+owner+" закінчуються!",
-  "терміново твітнути щось з тегом #perfect_time_ukr бо "+owner+" забув додати тупих фразочок..",
-  "подзвонити "+owner+" аби додав ще фразочок, бо старі закінчились зовсім.. #perfect_time_ukr",
-  "всі про мене забули :,( Ну знач наша пісня гарна нóва, починаймо її знову, пра "+owner+" ?"
-];
 
 //firebase
 const firebase = require('firebase/app');
 const admin = require('firebase-admin');
 require('firebase/auth');
 require('firebase/database-node');
-// const configFirebase= require('./configFirebase.json'); // rename the configFirebase0.json and fill it with your data
-// const adminCert = require('./admin.json'); // rename admin0.json and fill it with your data
 
 //Uncomment to initialize
 firebase.initializeApp(conf.configFirebase);
@@ -50,8 +36,9 @@ admin.initializeApp({
 //db
 let db = admin.database();
 let ref = db.ref("perfect/tweets/manual"); // change to the prefered path in your Firebase database
-let tweetsModerated, sn, tMod;
-
+let refPile = db.ref("queue/pile");
+let refDone = db.ref("done/tweets");
+let refStaged = db.ref("staged/tweets");
 
 var client = new twitter({
   consumer_key: conf.config.consumerKey,
@@ -59,30 +46,11 @@ var client = new twitter({
   access_token_key: conf.config.accessToken,
   access_token_secret: conf.config.accessTokenSecret
 });
-console.log("Initialization successfull. Waiting for the perfect time.. :) ");
-function dateToMoment(date) {
-  return moment(new Date(date)).tz(timeZone).format("HH:mm:ss");
-}
-function secondsToHours(sec){
-  var sec_num = parseInt(sec, 10); // don't forget the second param
-  var hours   = Math.floor(sec_num / 3600);
-  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-  var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
-  if (hours   < 10) {hours   = "0"+hours;}
-  if (minutes < 10) {minutes = "0"+minutes;}
-  if (seconds < 10) {seconds = "0"+seconds;}
-  return hours+':'+minutes+':'+seconds;
-}
+console.log("Initialization successfull. Waiting for the perfect time.. :) ");
 setInterval(function () { // first the interval is passed, then the code is being executed
-  ref.orderByKey().on("value", function(snapshot){
-    sn = snapshot.numChildren();
-    tweetsModerated = snapshot.val();
-  }, function(errorObject) {
-    console.log("The read failed: "+errorObject.code);
-  });
   let time = moment().tz(timeZone).format('HH:mm'); // getting the system time
-  if (time == sunRiseSetTime && time != lastTweetedTime) {
+  if (time == sunRiseSetTime && time != lastTweetedTime) { //posting the daily sun statistics
     http.request(sunInfoOpt, function(response) {
       let str = '';
       response.on('data', function(chunk) {
@@ -111,7 +79,7 @@ setInterval(function () { // first the interval is passed, then the code is bein
         }
         client.post('statuses/update', {status: tweetText+'\n'+time},  function(error, tweet, response) {
           if(error){
-            /* lol nothing */
+            console.log(error);
           }else{
             console.log(moment().tz(timeZone).format("HH:mm:ss ")+"tweeted -- "+tweetText);
             lastTweetedTime = time;
@@ -119,34 +87,69 @@ setInterval(function () { // first the interval is passed, then the code is bein
         });
       })
     }).end();
-
-    found = true;
   }
   if(time[0] == time[4] && time[1] == time[3] && time != lastTweetedTime && time != sunRiseSetTime){ // checking if the current time meets the AB:BA pattern
-    let found = false;
-    let i = 0;
-    while (i < sn && !found) {
-      let id = "t"+i+"t";
-      let posted = tweetsModerated[id].posted;
-      let valid = tweetsModerated[id].valid;
-      // tweetsModerated
-      if (!posted && valid) {
-        tweetText = tweetsModerated[id].text;
-        ref.child(id).update({"posted" : true});
-        console.log(tweetText);
-        client.post('statuses/update', {status: tweetText+'\n'+time},  function(error, tweet, response) {
-          if(error){
-            /* lol nothing */
-          }else{
-            console.log(moment().tz(timeZone).format("HH:mm:ss ")+"tweeted -- "+tweetText);
-            lastTweetedTime = time;
-          }
-        });
-        found = true;
-        break;
-      }
-      i++;
-    }
+    postAndUpdateSource(time);
   }
   // }, 5000);
 }, 30000);
+
+function postAndUpdateSource(time){
+  refPile.once("value").then(function(snapshot) {
+    if(snapshot.hasChildren()){
+      refPile.once("child_added", (snap) => {
+        let tweet = snap.val();
+        postTweet(tweet.text, snap.key, time);
+      })
+    }else{
+      console.log("No tweets in the Pile");
+    }
+  });
+}
+
+function postTweet(text, key, time){
+  if (text != "") {
+    client.post('statuses/update', {status: text+"\n"+time},  function(error, tweet, response) {
+      if(error){
+        if(error.code == 187){
+          console.log("Dup! "+key+" "+text);
+        }else{
+          console.log(error);
+        }
+      }else{
+        lastTweetedTime = time;
+        console.log("Tweeted! "+text);
+        moveToDone(key, tweet);
+      }
+    });
+  }
+}
+
+function moveToDone(key, tweet) {
+  refStaged.child(key).once("value", (snap) => {
+    let val = snap.val();
+    val.id = tweet.id;
+    val.id_str = tweet.id_str;
+    val.posted = true;
+    val.postedDate = moment().tz(timeZone).format("DD.MM.YYYY");
+    val.postedTime = moment().tz(timeZone).format("HH:mm");
+    refDone.child(val.author_uid+"/"+snap.key).set(val);
+    refPile.child(snap.key).remove();
+    refStaged.child(snap.key).remove();
+  })
+}
+
+function dateToMoment(date) {
+  return moment(new Date(date)).tz(timeZone).format("HH:mm:ss");
+}
+function secondsToHours(sec){
+  var sec_num = parseInt(sec, 10); // don't forget the second param
+  var hours   = Math.floor(sec_num / 3600);
+  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+  var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+  if (hours   < 10) {hours   = "0"+hours;}
+  if (minutes < 10) {minutes = "0"+minutes;}
+  if (seconds < 10) {seconds = "0"+seconds;}
+  return hours+':'+minutes+':'+seconds;
+}
