@@ -88,7 +88,15 @@ setInterval(function () { // first the interval is passed, then the code is bein
       })
     }).end();
   }
-  if(time[0] == time[4] && time[1] == time[3] && time != lastTweetedTime && time != sunRiseSetTime){ // checking if the current time meets the AB:BA pattern
+  if(time == "02:20" && time != lastTweetedTime){
+    let tweetID = '812375313564864512';
+    client.post('statuses/retweet/'+tweetID, function(err, tweet, resp) {
+      if(!err){
+        console.log(tweet);
+      }
+    })
+  }
+  if(time[0] == time[4] && time[1] == time[3] && time != lastTweetedTime && time != "02:20" && time != sunRiseSetTime){ // checking if the current time meets the AB:BA pattern
     postAndUpdateSource(time);
   }
   // }, 5000);

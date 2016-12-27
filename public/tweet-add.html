@@ -55,18 +55,19 @@
         <div class="card-content">
           <div class="container, layout horizontal">
             <div class="userpic-container">
-              <img class="userpic" id="up" src="[[photo(user.photoURL)]]" width="64px" height="64px"/>
+              <img class="userpic" id="up" src="[[user.photoURL]]" width="64px" height="64px"/>
             </div>
             <paper-textarea
             id="textarea"
             textinput={{textinput}}
-            label="Type your tweet here"
+            onclick="this.clicked"
+            label="Ідеальний Час, Щоб..."
             class="tweet-text"
             maxlength="136"
             char-counter>
           </paper-textarea>
           <div id="button-container" checklen={{textinput::change}}>
-          <paper-button raised class="button" id="add-button" on-tap="add">Add</paper-button>
+          <paper-button raised class="button" id="add-button" on-tap="add">Додати</paper-button>
           </div>
         </div>
       </div>
@@ -105,7 +106,11 @@ Polymer({
       }
     }
   },
+  clicked: function(){
+    this.$.textarea.label = "Ідеальний Час, щоб...";
+  },
   add: function() {
+    console.log(this.user.photoURL);
     let obj = "";
     let photoURL = this.twiPhoto(this.user.photoURL);
     //if anonymous -  set author to Anonymous
@@ -121,7 +126,7 @@ Polymer({
       author_uid: this.user.uid,
       lastEdit: this.user.displayName,
       lastEdit_uid: this.user.uid,
-      photoURL: photoURL,
+      photoURL: this.user.photoURL,
       queued: false,
       order: 0-Date.now()
     };
@@ -141,17 +146,18 @@ Polymer({
       }
     }
     if (this.$.textarea.value == null) {
-      this.$.textarea.label = "You gotta write something first :)";
+      this.$.textarea.label = "Спершу треба щось написати :)";
     }else if(this.$.textarea.value.length < 5){
-      this.$.textarea.label = "Can you write anything longer than that?..";
+      this.$.textarea.label = "А можна щось довшечке?..";
     }else{
-      this.$.textarea.label = "Thank you so much! Perfect timing! More of the same please ;)";
+      this.$.textarea.label = "Дяки ;) Давай ще!";
       this.$.query.ref.push(obj);
       this.$.textarea.value = null;
     }
     this.userDB()
   },
   userDB: function() {
+    console.log(this.user.photoURL);
     let usr = this.user;
     let photo = this.twiPhoto(usr.photoURL);
     let q = this.$.queryUser.ref.child(usr.uid);
@@ -163,7 +169,7 @@ Polymer({
               photoURL: photo
             });
       }else {
-        q.update({displayName: usr.displayName, photoURL: photo});
+        q.update({displayName: usr.displayName, photoURL: usr.photoURL});
       }
     }, function(errorObject) {
       console.log("The read failed: "+errorObject.code);

@@ -98,7 +98,7 @@
 <div id="tweets" class="layout vertical">
   <div class="list-container">
     <paper-card id="name" class="pcard">
-      <div class="tweet-text" id="name"><h1>Tweets in Queue</h1></div>
+      <div class="tweet-text" id="name"><h1>Черга</h1></div>
     </paper-card>
   </div>
   <template is="dom-repeat" items="[[staged]]" as="tweet">
@@ -123,22 +123,20 @@
           </paper-dialog>
           <div class="info">
             <div class="info-details" style="text-align: left;">
-              Status:
-              <template is="dom-if" if="[[admin.email]]"  restamp="true">
-                You are admin!
-              </template>
+              Статус:
+
               <template is="dom-if" if="[[tweet.posted]]" restamp="true">
                 Posted
               </template>
               <template is="dom-if" if="[[tweet.queued]]" restamp="true">
-                In The Queue
+                В Черзі
               </template>
               <template is="dom-if" if="[[!tweet.queued]]" restamp="true">
-                Waiting
+                Очікує
               </template>
             </div>
             <div class="info-details">
-              Author: [[tweet.author]]
+              Автор: [[tweet.author]]
             </div>
             <!-- <div class="info-details">
             Last Edit: [[tweet.lastEdit]]
@@ -153,8 +151,8 @@
         </template>
         <template is="dom-if" if="[[userdb.admin]]" restamp="true">
           <paper-button raised id="approve" key="[[textUpdateInput]]"
-            tweet=[[tweet]] on-tap="approve">
-            Approve
+            tweet=[[tweet]] on-tap="approve" hidden$="[[tweet.queued]]">
+            Норм
           </paper-button>
         </template>
     </div>
@@ -167,7 +165,7 @@
 <paper-card class="list-container">
   <div class="card-actions">
     <paper-button raised class="card-actions" id="load-more" on-tap="loadmore">
-      Load More
+      Показати старіші надходження
     </paper-button>
   </div>
 </paper-card>
